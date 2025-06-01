@@ -1,0 +1,296 @@
+/* css/minha-conta.css */
+body {
+    background-color: #f7f8fc; /* Um fundo suave e profissional */
+}
+
+.account-page-main-content {
+    padding-top: calc(var(--header-height) + 40px);
+    padding-bottom: 60px;
+    min-height: calc(100vh - var(--header-height) - 200px); /* Ajustar conforme altura do footer */
+}
+
+.account-layout {
+    display: flex;
+    gap: 30px; /* Espaçamento entre sidebar e conteúdo */
+}
+
+/* Sidebar */
+.account-sidebar {
+    flex: 0 0 280px; /* Largura fixa para a sidebar */
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+    padding: 25px;
+}
+
+.account-profile-summary {
+    text-align: center;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e9eef2;
+}
+
+.profile-picture-container {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    margin: 0 auto 15px auto;
+}
+
+.user-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--primary-color); /* Destaque suave */
+}
+
+.edit-avatar-btn {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background-color: var(--dark-color);
+    color: var(--light-color);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: 2px solid #fff;
+    transition: background-color 0.3s ease;
+}
+.edit-avatar-btn:hover {
+    background-color: var(--primary-color);
+}
+
+#user-account-name {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 1.3rem;
+    color: var(--dark-color);
+    margin-bottom: 4px;
+}
+
+#user-account-email {
+    font-size: 0.9rem;
+    color: #6c757d; /* Cinza mais suave */
+    word-break: break-all;
+}
+
+.account-navigation ul {
+    list-style: none;
+}
+.account-navigation li a {
+    display: flex;
+    align-items: center;
+    padding: 13px 18px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #555; /* Cor de texto sutil */
+    font-weight: 500;
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+.account-navigation li a i {
+    margin-right: 12px;
+    font-size: 1.1rem;
+    width: 20px; /* Para alinhar os textos */
+    color: #888;
+    transition: color 0.25s ease;
+}
+.account-navigation li a:hover {
+    background-color: #ffe6f2; /* Rosa bem clarinho no hover */
+    color: var(--primary-color);
+}
+.account-navigation li a:hover i {
+    color: var(--primary-color);
+}
+.account-navigation li a.active-account-tab {
+    background-color: var(--primary-color);
+    color: #fff;
+    font-weight: 600;
+}
+.account-navigation li a.active-account-tab i {
+    color: #fff;
+}
+
+/* Conteúdo Principal */
+.account-main-section {
+    flex-grow: 1;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+    padding: 30px 35px;
+}
+
+.account-tab-content {
+    display: none; /* Todas as abas escondidas por padrão */
+}
+.account-tab-content.active-content {
+    display: block; /* Mostra a aba ativa */
+    animation: fadeInContent 0.4s ease-out;
+}
+@keyframes fadeInContent {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.account-main-section h2 {
+    font-family: var(--font-pop);
+    color: var(--primary-color);
+    font-size: 2rem;
+    margin-bottom: 30px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary-color);
+    display: inline-block;
+}
+.account-main-section h3 { /* Para subtítulos dentro das seções */
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 1.4rem;
+    color: var(--dark-color);
+    margin-top: 25px;
+    margin-bottom: 15px;
+}
+
+/* Formulários */
+.account-main-section .form-group {
+    margin-bottom: 22px;
+}
+.account-main-section label {
+    display: block;
+    font-weight: 500; /* Mais leve que 600 */
+    color: #495057;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+.account-main-section input[type="text"],
+.account-main-section input[type="email"],
+.account-main-section input[type="password"] {
+    width: 100%;
+    max-width: 450px;
+    padding: 12px 16px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: var(--dark-color);
+    background-color: #fdfdff; /* Fundo do input quase branco */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.account-main-section input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(var(--rgb-primary-color), 0.15);
+}
+.account-main-section input[readonly] {
+    background-color: #e9ecef; /* Cinza claro para campos readonly */
+    cursor: not-allowed;
+}
+.account-main-section .btn-primary {
+    padding: 12px 28px;
+}
+.avatar-note {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-top: 15px;
+}
+
+/* Seção Assinatura Específica */
+#active-subscription-details p, #no-active-subscription p {
+    line-height: 1.7;
+    margin-bottom: 12px;
+    font-size: 1rem;
+}
+#active-subscription-details .status-active { color: #28a745; font-weight: bold; }
+#active-subscription-details .status-expired { color: #dc3545; font-weight: bold; }
+.subscription-benefits ul {
+    list-style: none;
+    padding-left: 5px;
+}
+.subscription-benefits li {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+.subscription-benefits li i {
+    color: #28a745; /* Ícone de check verde */
+    margin-right: 8px;
+}
+#no-active-subscription {
+    text-align: center;
+    padding: 20px;
+    background-color: #fff9fb; /* Fundo rosa bem clarinho */
+    border-radius: 8px;
+    border: 1px dashed var(--primary-color);
+}
+#no-active-subscription h3 { color: var(--primary-color); }
+#no-active-subscription ul { text-align: left; display: inline-block; margin-top: 10px; }
+
+/* Responsividade */
+@media (max-width: 992px) {
+    .account-layout { flex-direction: column; }
+    .account-sidebar { flex: 0 0 auto; width: 100%; margin-bottom: 30px; }
+}
+@media (max-width: 768px) {
+    .account-main-section input[type="text"],
+    .account-main-section input[type="email"],
+    .account-main-section input[type="password"] {
+        max-width: 100%;
+    }
+}
+
+.saved-address-card {
+    background-color: #f8f9fa; /* Cor de fundo suave */
+    border: 1px solid #e0e5eb; /* Borda sutil */
+    border-left: 5px solid var(--primary-color); /* Destaque na esquerda */
+    padding: 20px 25px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.saved-address-card h4 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    color: var(--dark-color); /* Ou var(--primary-color) */
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+}
+.saved-address-card h4 i {
+    margin-left: 10px;
+    color: var(--primary-color);
+}
+.saved-address-card p {
+    margin-bottom: 8px;
+    line-height: 1.6;
+    color: #454d55;
+}
+.saved-address-card .btn-secondary {
+    margin-top: 15px;
+    background-color: var(--secondary-color); /* Ajuste as cores do botão se necessário */
+    border-color: var(--secondary-color);
+    color: #fff;
+}
+.saved-address-card .btn-secondary:hover {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+#no-address-saved-message p {
+    font-size: 0.95rem;
+    color: #6c757d;
+}
+.account-nav-link-inline { /* Estilo para o link dentro da mensagem */
+    color: var(--primary-color);
+    text-decoration: underline;
+    font-weight: 500;
+    cursor: pointer;
+}
+.account-nav-link-inline:hover {
+    color: var(--secondary-color); /* Ou um tom mais escuro da primary-color */
+}
+/* **** FIM DO NOVO CÓDIGO CSS **** */

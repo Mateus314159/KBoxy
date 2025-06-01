@@ -1,0 +1,17 @@
+# Dependências
+node_modules/
+
+# Arquivos de ambiente (contêm senhas, chaves de API)
+.env
+*.env
+
+# Logs
+*.log
+
+# Arquivos de build/distribuição (se aplicável)
+dist/
+build/
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db

@@ -1,0 +1,1610 @@
+/*------------------------------------*\
+    #RESET & NORMALIZE
+\*------------------------------------*/
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+    font-size: 16px; /* Base para REM */
+    height: 100%;
+    overflow-x: hidden !important; /* Prevenir scroll horizontal globalmente */
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.6;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow-x: hidden !important; /* Prevenir scroll horizontal globalmente */
+    /* overflow-y: auto; /* Garante que a barra de rolagem vertical apareça apenas se necessário */
+}
+
+main {
+    flex-grow: 1;
+}
+
+/*------------------------------------*\
+    #VARIABLES & THEME
+\*------------------------------------*/
+:root {
+    --primary-color: #FF007F;      /* Rosa Neon */
+    --secondary-color: #C8A2C8;    /* Lilás */
+    --accent-color: #89CFF0;       /* Azul Bebê */
+    --dark-color: #1A1A1A;         /* Preto Elegante */
+    --light-color: #FFFFFF;
+    --text-color: #333;
+    --bg-color: #FFFFF0;           /* Fundo claro suave */
+    --card-bg-color: #FFFFF0;
+    --border-color: #e0e0e0;
+    --rgb-primary-color: 255, 0, 127; /* Para sombras de botões */
+    --font-pop: 'Fredoka One', cursive;
+    --header-height: 70px;
+    --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    --gradient-accent: linear-gradient(135deg, var(--accent-color), #a1c4fd);
+    --gradient-banner: linear-gradient(rgba(26, 26, 26, 0.7), rgba(26, 26, 26, 0.7)), url('https://placehold.co/1920x800/2c2c2c/6C63FF?text=K-Pop+Banner&font=Poppins');
+}
+
+
+/*------------------------------------*\
+    #GLOBAL ANIMATIONS (KEYFRAMES)
+\*------------------------------------*/
+@keyframes gentleBobbing {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.7; }
+}
+
+@keyframes slideDownModal {
+  from { opacity: 0; transform: translateY(-50px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes rotateAroundZ {
+  from { transform: rotateZ(0deg); }
+  to { transform: rotateZ(360deg); }
+}
+
+/*------------------------------------*\
+    #UTILITIES & HELPERS
+\*------------------------------------*/
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    /* overflow-x: hidden;  Removido daqui, pois o html/body já cuidam disso globalmente */
+}
+
+.section-padding {
+    padding: 60px 0;
+}
+
+.section-title {
+    font-family: var(--font-pop);
+    font-size: 2.5rem;
+    color: #000000;
+    text-align: center;
+    margin-bottom: 40px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    overflow-wrap: break-word;
+}
+
+.section-title .highlight {
+    color: #ff096d;
+    display: inline-block;
+}
+
+
+.k-pop-icon {
+    margin-left: 8px;
+    color: var(--primary-color);
+}
+
+.k-pop-icon-small {
+    font-size: 0.8em;
+    color: var(--secondary-color);
+}
+
+/* --- Buttons --- */
+.btn {
+    display: inline-block;
+    padding: 12px 28px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    border: none;
+    position: relative;
+    color: var(--light-color);
+    box-shadow: 0 3px 0px rgba(0, 0, 0, 0.2),
+                0 5px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.15s ease-out;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0px rgba(0, 0, 0, 0.2),
+                0 7px 12px rgba(0, 0, 0, 0.2);
+    filter: brightness(105%);
+}
+
+.btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 0px rgba(0, 0, 0, 0.2),
+                0 2px 4px rgba(0, 0, 0, 0.15);
+    filter: brightness(95%);
+}
+
+.btn-primary {
+    background: var(--gradient-primary);
+    color: var(--light-color);
+    box-shadow: 0 3px 0px rgba(var(--rgb-primary-color), 0.4),
+                0 5px 8px rgba(var(--rgb-primary-color), 0.25),
+                0 5px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0px rgba(var(--rgb-primary-color), 0.35),
+                0 7px 12px rgba(var(--rgb-primary-color), 0.3),
+                0 7px 12px rgba(0, 0, 0, 0.15);
+    filter: brightness(110%);
+}
+
+.btn-primary:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 0px rgba(var(--rgb-primary-color), 0.5),
+                0 2px 4px rgba(var(--rgb-primary-color), 0.2),
+                0 2px 4px rgba(0, 0, 0, 0.1);
+    filter: brightness(90%);
+}
+
+.btn-secondary {
+    background-color: var(--accent-color);
+    color: var(--dark-color);
+}
+
+.btn-secondary:hover {
+    background-color: transparent;
+    color: var(--accent-color);
+    border: 2px solid var(--accent-color);
+}
+
+
+
+
+
+.btn-large {
+    padding: 15px 35px;
+    font-size: 1.1rem;
+}
+
+.btn-small {
+    padding: 8px 20px;
+    font-size: 0.9rem;
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    font-size: 1.1rem;
+}
+
+/*------------------------------------*\
+    #PAGE COMPONENTS
+\*------------------------------------*/
+
+/* ## PRELOADER ## */
+.preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.preloader.loaded {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.preloader-logo {
+    width: 100px;
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+.spinner {
+    border: 8px solid var(--border-color);
+    border-top: 8px solid var(--primary-color);
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+}
+
+/* ## HEADER ## */
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(255, 255, 240, 0.92);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    height: var(--header-height);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+
+
+.header.scrolled {
+    background-color: var(--card-bg-color);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+}
+.header-user-avatar {
+    width: 30px;  /* Ajuste o tamanho conforme seu design */
+    height: 30px; /* Ajuste o tamanho conforme seu design */
+    border-radius: 50%; /* Para imagem redonda */
+    object-fit: cover;   /* Para cobrir o espaço sem distorcer */
+    vertical-align: middle;
+    border: 1px solid var(--primary-color); /* Opcional: pequena borda */
+}
+
+.logo {
+    text-decoration: none;
+    display: inline-block;
+}
+
+.logo img {
+    height: 150px;
+    width: auto;
+    display: block;
+    vertical-align: middle;
+}
+
+.nav-menu {
+    display: flex; /* Visível por padrão (desktop) */
+}
+.nav-list {
+    list-style: none;
+    display: flex;
+}
+
+.nav-list li {
+    margin-left: 25px;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: 600;
+    position: relative;
+    padding-bottom: 5px;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--primary-color);
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+    width: 100%;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+}
+
+.header-icon-btn {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 1.7rem;
+    cursor: pointer;
+    padding: 5px;
+    margin-left: 15px;
+    display: flex;
+    align-items: center;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.header-icon-btn:hover {
+    color: var(--primary-color);
+    transform: scale(1.1);
+}
+
+.theme-toggle-btn {
+    font-size: 1.5rem;
+    /* Herda outros estilos de .header-icon-btn se tiver essa classe no HTML */
+}
+
+.menu-toggle {
+    display: none; /* Escondido no desktop */
+    font-size: 1.8rem;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    cursor: pointer;
+    margin-left: 15px;
+    padding: 5px;
+}
+
+/* ## USER ACTIONS DROPDOWN ## */
+.user-action-container {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 15px;
+}
+
+#login-action-button {
+    position: relative;
+    z-index: 1002;
+    /* Herda de .header-icon-btn */
+}
+
+.user-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background-color: var(--card-bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
+    z-index: 1001;
+    width: 170px;
+    padding: 8px 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px) scale(0.95);
+    transform-origin: top right;
+    transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out, visibility 0s linear 0.2s;
+}
+
+.user-dropdown-menu.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+    transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out, visibility 0s linear 0s;
+}
+
+.user-dropdown-menu a {
+    display: block;
+    padding: 10px 20px;
+    text-decoration: none;
+    color: var(--text-color);
+    font-size: 0.95rem;
+    white-space: nowrap;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.user-dropdown-menu a:hover {
+    background-color: var(--bg-color);
+    color: var(--primary-color);
+}
+
+/* ## BANNER ## */
+.banner {
+    height: 100vh;
+    min-height: 600px;
+    background-color: #000000;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    color: var(--light-color);
+    padding-top: var(--header-height);
+}
+
+.banner-video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: 0;
+    transform: translateX(-50%) translateY(-50%);
+    background-size: cover;
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.banner-video.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.banner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    background-color: rgba(0, 0, 0, 0.6); /* Ajuste este valor */
+}
+
+.banner-content {
+    position: relative;
+    z-index: 2;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.5s ease-in-out 0.3s;
+}
+
+.banner-content.hidden-by-video {
+    opacity: 0;
+    visibility: hidden;
+    transition: none;
+}
+
+.banner-title {
+    font-family: var(--font-pop);
+    font-size: 3.5rem;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    line-height: 1.2;
+    color: var(--light-color);
+    display: inline-block;
+    overflow-wrap: break-word;
+}
+
+.banner-title .animated-letter {
+    display: inline-block;
+    position: relative;
+    transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1), color 0.2s ease;
+    text-shadow: 2px 2px 4px rgb(7, 3, 255);
+}
+
+.banner-title .animated-letter.highlight-letter {
+    color: var(--primary-color);
+}
+
+.banner-title .animated-letter:hover {
+    transform: scale(1.2) translateY(-5px);
+    color: var(--primary-color);
+}
+
+
+
+.banner-subtitle {
+    font-size: 1.3rem;
+    margin-bottom: 30px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+    overflow-wrap: break-word;
+}
+
+/* ## ABOUT SECTION ## */
+.about-section {
+    background-color: var(--bg-color);
+    min-height: 100vh; /* Permite que a seção cresça com o conteúdo */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+
+.about-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    align-items: center;
+}
+
+.about-text {
+    flex: 1;
+    min-width: 300px;
+    overflow-wrap: break-word;
+}
+
+.about-text p {
+    margin-bottom: 15px;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    text-align: justify;
+}
+
+.about-image {
+    flex: 1;
+    min-width: 300px;
+    text-align: center;
+}
+
+.about-image img {
+    max-width: 150%;
+    height: auto;
+    border-radius: 15px;
+    filter: drop-shadow(5px 5px 8px rgba(0, 0, 0, 0.35));
+    animation: gentleBobbing 3s ease-in-out infinite;
+    display: block;
+    margin: 0 auto;
+}
+
+/* ## BOXES SECTION (GRID & CAROUSEL) ## */
+.boxes-section {
+    background: var(--gradient-accent);
+    padding-top: 80px;
+    padding-bottom: 80px;
+    min-height: 100vh; /* Permite que a seção cresça */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+
+.boxes-section .section-title {
+    margin-bottom: 60px;
+}
+
+/* Estilo base do Card da Box */
+.box-card {
+    background-color: var(--card-bg-color);
+    border-radius: 15px;
+    overflow: hidden; /* Conteúdo interno como texto será cortado se exceder o padding */
+    box-shadow:
+        0 2px 5px rgba(0, 0, 0, 0.06),
+        0 8px 16px rgba(0, 0, 0, 0.07),
+        0 15px 30px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* Hover para Desktop */
+.boxes-grid .box-card:hover { /* Aplicar hover 3D apenas no grid desktop */
+    transform: translateY(-12px) scale(1.03) translateZ(25px) rotateY(7deg);
+    box-shadow:
+        0 4px 8px rgba(0, 0, 0, 0.08),
+        0 12px 24px rgba(0, 0, 0, 0.1),
+        0 22px 45px rgba(0, 0, 0, 0.08);
+}
+
+.box-image { /* Padronizado */
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+}
+
+.box-card-content {
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.box-card-content {
+  text-align: justify;
+}
+
+
+.box-name {
+    font-family: var(--font-pop);
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    text-align: center;
+    overflow-wrap: break-word;
+}
+
+.box-price {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.box-description {
+    font-size: 0.95rem;
+    color: var(--text-color);
+    opacity: 0.8;
+    margin-bottom: 20px;
+    flex-grow: 1;
+    overflow-wrap: break-word;
+    /* Para limitar a altura da descrição e adicionar scroll INTERNO ao parágrafo:
+    max-height: 7.5em; /* Aproximadamente 5 linhas, ajuste conforme necessário (line-height * número de linhas) */
+    /* overflow-y: auto; */
+    /* padding-right: 5px; /* Espaço para a barra de rolagem não cobrir o texto */
+}
+
+.box-card .btn-ver-mais {
+    margin-top: auto;
+}
+
+/* ### Boxes Grid (VISÍVEL NO DESKTOP POR PADRÃO) ### */
+.boxes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    align-items: stretch;
+    justify-content: center;
+    perspective: 1000px; /* Para o hover 3D */
+}
+
+/* ### Boxes Carousel (ESCONDIDO NO DESKTOP POR PADRÃO) ### */
+.box-carousel-mobile {
+    display: none;
+    padding-bottom: 50px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.box-carousel-mobile .swiper-slide {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    height: auto;
+    padding: 0 5px;
+}
+
+.box-carousel-mobile .box-card {
+    width: 100%;
+    max-width: 350px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Estilos do Swiper */
+.swiper-button-next,
+.swiper-button-prev {
+    color: var(--primary-color) !important;
+    border-radius: 50%;
+    width: 40px !important;
+    height: 40px !important;
+    transition: color 0.3s ease;
+}
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+    color: var(--secondary-color) !important;
+}
+.swiper-button-next::after,
+.swiper-button-prev::after {
+    font-size: 1.5rem !important;
+}
+.swiper-pagination-bullet {
+    background-color: var(--light-color) !important;
+    opacity: 0.6 !important;
+}
+.swiper-pagination-bullet-active {
+    background-color: var(--primary-color) !important;
+    opacity: 1 !important;
+}
+
+/* ### Box Details Modal ### */
+.box-details-modal {
+    display: none;
+    position: fixed;
+    z-index: 2001; /* Acima dos modais de login/registro se eles são 2000 */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* Overlay não rola */
+    background-color: rgba(0,0,0,0.6);
+    align-items: center;
+    justify-content: center;
+}
+
+/* Conteúdo do modal (geral, também usado por login/registro) */
+.modal-content {
+    background-color: var(--card-bg-color);
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 600px; /* Padrão para detalhes da box */
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    animation: slideDownModal 0.5s ease-out;
+    max-height: 90vh; /* Limita altura do modal */
+    overflow-y: auto; /* Adiciona scroll se o conteúdo interno for muito grande */
+}
+
+.close-modal-btn { /* Para o modal de detalhes da box */
+    color: var(--text-color);
+    opacity: 0.7;
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s ease, opacity 0.3s ease;
+    z-index: 1; /* Para ficar acima de outros conteúdos do modal */
+}
+.close-modal-btn:hover,
+.close-modal-btn:focus {
+    color: var(--primary-color);
+    opacity: 1;
+    text-decoration: none;
+}
+
+.modal-box-image {
+    width: 100%;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    display: block;
+}
+
+#modalBoxName {
+    font-family: var(--font-pop);
+    color: var(--primary-color);
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    overflow-wrap: break-word;
+}
+
+
+#modalBoxPrice {
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+#modalBoxDescriptionFull {
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    overflow-wrap: break-word;
+}
+#modalBoxDescriptionFull ul {
+    list-style-position: inside;
+    padding-left: 0; /* Ajustado para melhor alinhamento com list-style-position: inside */
+}
+#modalBoxDescriptionFull li {
+    margin-bottom: 5px;
+}
+
+/* ## TESTIMONIALS SECTION ## */
+.testimonials-section {
+    background-color: var(--bg-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.testimonial-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.testimonial-card {
+    background-color: var(--card-bg-color);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.07);
+    text-align: center;
+    border-left: 5px solid var(--secondary-color);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.testimonial-card:hover {
+    transform: translateY(-5px) scale(1.01);
+}
+
+
+
+.testimonial-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 20px;
+    border: 3px solid var(--primary-color);
+    align-self: center;
+}
+
+.testimonial-text {
+    font-style: italic;
+    margin-bottom: 15px;
+    font-size: 1rem;
+    color: var(--text-color);
+    opacity: 0.9;
+    flex-grow: 1;
+    overflow-wrap: break-word;
+}
+
+.testimonial-author {
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-top: auto;
+}
+
+
+/* ## CONTACT / NEWSLETTER SECTION ## */
+.contact-section {
+    background-image: var(--gradient-primary);
+    color: var(--light-color);
+    text-align: center;
+    min-height: 100vh; /* Ou 50vh se estiver no dual-wrapper */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.contact-section .section-title,
+.contact-section .section-title .highlight,
+.contact-section .section-title .k-pop-icon {
+    color: var(--light-color);
+}
+
+.contact-subtitle {
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 0.9;
+    overflow-wrap: break-word;
+}
+
+.newsletter-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.newsletter-input {
+    flex-grow: 1;
+    padding: 15px 20px;
+    border-radius: 50px;
+    border: 2px solid rgba(255,255,255,0.5);
+    background-color: rgba(255,255,255,0.2);
+    color: var(--light-color);
+    font-size: 1rem;
+    outline: none;
+}
+
+.newsletter-input::placeholder {
+    color: rgba(255,255,255,0.7);
+}
+
+.newsletter-form .btn-primary {
+    background: var(--light-color);
+    color: var(--primary-color);
+    box-shadow: none;
+}
+.newsletter-form .btn-primary:hover {
+    background: var(--accent-color);
+    color: var(--dark-color);
+}
+
+/* ## FOOTER ## */
+.footer {
+    background-color: var(--dark-color);
+    color: #a0a0a0;
+    padding: 50px 0;
+    font-size: 0.9rem;
+}
+
+
+
+.footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.footer-logo {
+    font-family: var(--font-pop);
+    font-size: 1.7rem;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    overflow-wrap: break-word;
+}
+
+.footer-about p {
+    margin-bottom: 10px;
+    line-height: 1.7;
+    overflow-wrap: break-word;
+}
+
+.footer h4 {
+    color: var(--light-color);
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    overflow-wrap: break-word;
+}
+
+.footer-links ul {
+    list-style: none;
+}
+
+.footer-links li a {
+    text-decoration: none;
+    color: #a0a0a0;
+    margin-bottom: 8px;
+    display: inline-block;
+    transition: color 0.3s ease, transform 0.3s ease;
+    overflow-wrap: break-word;
+}
+
+.footer-links li a:hover {
+    color: var(--primary-color);
+    transform: translateX(5px);
+}
+
+.footer-social a {
+    color: #a0a0a0;
+    font-size: 1.5rem;
+    margin-right: 15px;
+    transition: color 0.3s ease, transform 0.3s ease;
+    display: inline-block;
+}
+.footer-social a:last-child {
+    margin-right: 0;
+}
+
+.footer-social a:hover {
+    color: var(--primary-color);
+    transform: scale(1.2) rotate(5deg);
+}
+
+#currentYear {
+    font-weight: bold;
+}
+
+/* ## BACK TO TOP BUTTON ## */
+.back-to-top-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: var(--gradient-primary);
+    color: var(--light-color);
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.back-to-top-btn.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.back-to-top-btn:hover {
+    box-shadow: 0 6px 15px rgba(var(--rgb-primary-color), 0.5);
+    transform: scale(1.1);
+}
+
+/* ## USER LOGIN/REGISTER MODALS ## */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.65);
+    display: none; /* JS controla para flex */
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out, visibility 0s linear 0.3s;
+    overflow: hidden;
+}
+
+.modal-overlay.active {
+    display: flex;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease-in-out, visibility 0s linear 0s;
+}
+
+.login-modal-content { /* Especificamente para login/registro, para não conflitar com .modal-content de detalhes da box */
+     background-color: #FFFFFF;
+    padding: 40px 45px;
+    border-radius: 12px;
+     max-width: 430px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+    width: 90%;
+    max-width: 420px;
+    text-align: center;
+    position: relative;
+    transform: scale(0.95) translateY(-15px);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease-in-out;
+    opacity: 0;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-overlay.active .login-modal-content {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+
+.login-modal-content h2 {
+    font-family: 'Poppins', sans-serif; /* Alterado de var(--font-pop) */
+    color: #333333; /* Um cinza escuro e elegante, em vez de var(--primary-color) aqui */
+    margin-bottom: 35px; /* Aumentar um pouco o espaçamento inferior */
+    font-size: 1.9rem;   /* Ajuste conforme o visual desejado (era 2.2rem) */
+    font-weight: 600;
+    letter-spacing: 0.5px; /* Espaçamento sutil entre as letras */
+}
+
+
+.form-group {
+    margin-bottom: 22px;
+    text-align: left;
+}
+
+.form-group label {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500; /* Um pouco menos pesado */
+    margin-bottom: 8px;
+    font-size: 0.875rem; /* 14px */
+    color: #555555; /* Cinza médio */
+}
+
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group input[type="text"] { /* Adicionado type="text" para consistência, caso use */
+    width: 100%;
+    padding: 14px 18px; /* Bom padding interno */
+    border: 1px solid #DDE2E5; /* Borda cinza clara, profissional */
+    border-radius: 8px; /* Cantos suavemente arredondados */
+    font-size: 0.9375rem; /* 15px */
+    background-color: #F9FAFB; /* Fundo muito levemente acinzentado/azulado */
+    color: #333333;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input[type="email"]:focus,
+.form-group input[type="password"]:focus,
+.form-group input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(var(--rgb-primary-color), 0.15); /* Sombra de foco suave */
+}
+
+.form-group input::placeholder {
+    color: #A0A0A0; /* Placeholder um pouco mais escuro para melhor leitura */
+    /* font-style: italic; /* Opcional */
+}
+
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-wrapper input[type="password"],
+.password-wrapper input[type="text"] {
+    padding-right: 45px !important;
+}
+
+.password-toggle-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #757575;
+    font-size: 1.1rem;
+}
+.password-toggle-icon:hover {
+    color: var(--primary-color);
+}
+
+.form-switch {
+    margin-top: 28px;
+    font-size: 0.875rem; /* 14px */
+}
+
+.form-switch a {
+    color: var(--primary-color); /* Manter a cor primária para ações clicáveis */
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.form-switch a:hover {
+    text-decoration: underline;
+    color: var(--secondary-color); /* Um hover mais suave */
+}
+
+.close-modal-icon-btn { /* Para Login/Register Modals */
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 2.2rem;
+    color: var(--text-color);
+    opacity: 0.6;
+    cursor: pointer;
+    line-height: 1;
+    padding: 5px;
+    transition: color 0.3s ease, opacity 0.3s ease;
+    z-index: 1; /* Para ficar acima de outros conteúdos do modal */
+}
+.close-modal-icon-btn:hover {
+    opacity: 1;
+    color: var(--primary-color);
+}
+
+/*------------------------------------*\
+    #SPECIAL LAYOUTS
+\*------------------------------------*/
+.dual-section-wrapper {
+    display: flex;
+    flex-direction: column;
+    /* Se as seções internas definem a altura, o wrapper não precisa de min-height: 100vh */
+}
+
+.half-height-section {
+    flex: 1; /* Se dentro de .dual-section-wrapper, isso ajuda a dividir o espaço */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 30px 0;
+    overflow: hidden; /* Corta conteúdo que exceder esta seção de meia altura */
+    min-height: 50vh;
+}
+
+/* Seções de tela cheia - ajuste para controle de conteúdo interno */
+.about-section,
+.boxes-section,
+.testimonials-section, /* Se não estiver em .dual-section-wrapper */
+.contact-section { /* Se não estiver em .dual-section-wrapper */
+    min-height: 100vh; /* Permite que a seção cresça, se necessário */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* Para forçar a altura e fazer o conteúdo INTERNO rolar, se exceder: */
+    /* height: 100vh; */
+    /* overflow-y: auto; */
+    /* justify-content: flex-start; /* Alinha o conteúdo ao topo para rolagem */
+}
+
+.about-section .container,
+.boxes-section .container,
+.testimonials-section .container,
+.contact-section .container {
+    width: 100%;
+}
+
+/*------------------------------------*\
+    #RESPONSIVE DESIGN (Media Queries)
+\*------------------------------------*/
+
+@media (max-width: 992px) {
+    .section-title { font-size: 2.2rem; }
+    .banner-title { font-size: 2.8rem; }
+    .banner-subtitle { font-size: 1.1rem; }
+
+    .about-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    .about-text { text-align: justify; }
+    .about-image { margin-top: 30px; }
+    .about-image img { max-width: 60%; }
+
+    /* Ajuste para ações do header em telas médias */
+    .header-actions .btn-primary {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+    }
+    .header-icon-btn, .theme-toggle-btn, .menu-toggle {
+        margin-left: 10px; /* Reduz um pouco o espaçamento */
+    }
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    :root { --header-height: 65px; }
+    html, body {
+        width: 100%;
+        max-width: 100%;
+    }
+    main, .header, .footer, .container {
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .header .container { padding: 0 15px; }
+    .logo img { height: 45px; }
+
+    .nav-menu {
+        position: fixed;
+        top: var(--header-height);
+        left: -100%;
+        width: 80%;
+        max-width: 300px;
+        height: calc(100vh - var(--header-height));
+        background-color: var(--card-bg-color);
+        box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 30px;
+        transition: left 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        overflow-y: auto;
+        z-index: 999;
+    }
+  
+
+    .nav-list { flex-direction: column; width: 100%; }
+    .nav-list li { margin-left: 0; margin-bottom: 20px; width: 100%; }
+    .nav-link { font-size: 1.2rem; display: block; padding: 10px 0; }
+    .nav-link::after { left: 0; }
+
+    .menu-toggle { display: flex !important; }
+    .menu-toggle.active .fa-bars { display: none; }
+    .menu-toggle.active .fa-times { display: block !important; }
+    .menu-toggle .fa-times { display: none; }
+
+    .header-actions .btn-primary { display: none; }
+    .header-actions { /* Ajuste para os ícones restantes */
+        gap: 0; /* Remove gap se os botões estiverem muito juntos */
+    }
+    #login-action-button { margin-left: auto; font-size: 1.8rem; }
+    .theme-toggle-btn { margin-left: 10px; font-size: 1.5rem;}
+    .menu-toggle { margin-left: 10px; font-size: 1.8rem;}
+
+
+    .banner-title { font-size: 2rem; }
+    .banner-subtitle { font-size: 1rem; }
+
+    .banner-title .animated-letter:hover { transform: none; }
+    .banner-title .animated-letter:not(.highlight-letter):hover { color: var(--light-color); }
+    .banner-title .animated-letter.highlight-letter:hover { color: var(--primary-color); }
+
+    .boxes-grid { display: none !important; }
+    .box-carousel-mobile { display: block !important; }
+    .box-carousel-mobile .box-card:hover {
+        transform: translateY(-5px) scale(1.02);
+        box-shadow:
+            0 3px 6px rgba(0, 0, 0, 0.07),
+            0 10px 20px rgba(0, 0, 0, 0.08),
+            0 18px 35px rgba(0, 0, 0, 0.06);
+    }
+
+    .newsletter-form { flex-direction: column; gap: 15px; }
+    .newsletter-input, .newsletter-form .btn { width: 100%; }
+
+    .footer-content { grid-template-columns: 1fr; text-align: center; }
+    .footer-social { margin-top: 20px; }
+    .footer-social a { margin: 0 10px; }
+    .footer-links ul { padding-left: 0; }
+
+    .dual-section-wrapper { flex-direction: column; }
+    .half-height-section { min-height: 50vh; padding: 40px 0; }
+
+    .about-image img { max-width: 70%; }
+}
+
+/* Desktop Styles (Reforço e Correções) */
+@media (min-width: 769px) {
+    .boxes-grid {
+        display: grid !important; /* Garante que o grid seja exibido */
+    }
+    .box-carousel-mobile {
+        display: none !important;
+        height: 0 !important;
+        overflow: hidden !important;
+        visibility: hidden !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    .boxes-grid .box-card:hover { /* Hover original desktop */
+        transform: translateY(-12px) scale(1.03) translateZ(25px) rotateY(7deg);
+        box-shadow:
+            0 4px 8px rgba(0, 0, 0, 0.08),
+            0 12px 24px rgba(0, 0, 0, 0.1),
+            0 22px 45px rgba(0, 0, 0, 0.08);
+    }
+    /* Garante que o menu mobile e toggle não apareçam no desktop */
+    .nav-menu {
+        position: static;
+        left: auto;
+        width: auto;
+        max-width: none;
+        height: auto;
+        background-color: transparent;
+        box-shadow: none;
+        flex-direction: row;
+        padding: 0;
+        overflow-y: visible; /* Menu desktop não precisa de scroll interno */
+    }
+    .nav-list { flex-direction: row; } /* Já definido, mas para reforçar */
+    .nav-list li { margin-left: 25px; margin-bottom: 0; width: auto; }
+    .menu-toggle { display: none !important; }
+    .header-actions .btn-primary { display: inline-block; } /* Mostra "Compre Agora" */
+    .header-actions #theme-toggle { display: flex; } /* Garante que o theme-toggle seja visível */
+}
+
+/* Small Mobile Styles */
+@media (max-width: 480px) {
+    :root { --header-height: 60px; }
+    .section-title { font-size: 1.8rem; }
+    .banner-title { font-size: 1.9rem; }
+
+    .btn { padding: 10px 22px; font-size: 0.9rem; }
+    .btn-large { padding: 12px 28px; font-size: 1rem; }
+
+    .box-name { font-size: 1.3rem; }
+    .box-price { font-size: 1.1rem; }
+
+    .login-modal-content { padding: 25px 20px; max-width: 90%;}
+    /* Para o modal de detalhes da box, se usar .modal-content */
+    .box-details-modal .modal-content { padding: 25px 20px; max-width: 90%;}
+
+
+    .login-modal-content h2 { font-size: 1.8rem; }
+
+    .about-image img { max-width: 80%; }
+}
+
+/* Hover Media Query (para desabilitar certos hovers em touch) */
+@media (hover: none) and (pointer: coarse) {
+    /* .banner-title .animated-letter:hover já tratado em (max-width: 768px) */
+    .btn:hover {
+        /* Mantém o estado base no toque, evitando hover "grudado" */
+        transform: translateY(0);
+        box-shadow: 0 3px 0px rgba(0, 0, 0, 0.2),
+                    0 5px 8px rgba(0, 0, 0, 0.15);
+        filter: brightness(100%);
+    }
+    .btn-primary:hover {
+        transform: translateY(0);
+        box-shadow: 0 3px 0px rgba(var(--rgb-primary-color), 0.4),
+                    0 5px 8px rgba(var(--rgb-primary-color), 0.25),
+                    0 5px 8px rgba(0, 0, 0, 0.1);
+        filter: brightness(100%);
+    }
+    .box-card:hover { /* Desabilita o hover 3D complexo no toque */
+        transform: none;
+        box-shadow:
+            0 2px 5px rgba(0, 0, 0, 0.06),
+            0 8px 16px rgba(0, 0, 0, 0.07),
+            0 15px 30px rgba(0, 0, 0, 0.05);
+    }
+}
+/*------------------------------------*\
+    #SUBSCRIPTION PLANS MODAL (NOVO)
+\*------------------------------------*/
+/* .modal-overlay já possui estilos base. Vamos focar no conteúdo específico. */
+
+.subscription-plans-modal-content {
+    background-color: var(--card-bg-color);
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+    width: 90%;
+    max-width: 700px; /* Ajuste conforme necessário, pode ser maior que o de login */
+    text-align: center;
+    position: relative; /* Para o botão de fechar */
+    transform: scale(0.95) translateY(-15px); /* Animação de entrada */
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease-in-out;
+    opacity: 0;
+    max-height: 90vh; /* Para permitir scroll interno se necessário */
+    overflow-y: auto; /* Adiciona scroll se o conteúdo exceder a altura */
+}
+
+/* Estado ativo para animação de entrada do modal de planos */
+.modal-overlay.active .subscription-plans-modal-content {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+
+#subscriptionBoxNameModalTitle { /* Usando ID específico do HTML */
+    font-family: var(--font-pop);
+    color: var(--primary-color);
+    margin-bottom: 25px;
+    font-size: 2rem;
+    overflow-wrap: break-word;
+}
+
+.plans-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Espaçamento entre os itens de plano */
+    margin-top: 20px;
+}
+
+.plan-item {
+    background-color: var(--bg-color); /* Um fundo sutilmente diferente */
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    text-align: left;
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+.plan-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+
+.plan-item h4 {
+    font-family: 'Poppins', sans-serif; /* Mantém consistência */
+    font-weight: 700; /* Mais destaque */
+    color: var(--dark-color); /* Cor de texto principal para o título do plano */
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+}
+
+.plan-item .plan-price {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--primary-color); /* Destaque no preço */
+    margin-bottom: 5px;
+}
+
+.plan-item .plan-billing-info {
+    font-size: 0.9rem;
+    color: var(--text-color);
+    opacity: 0.7;
+    margin-bottom: 10px;
+}
+
+.plan-item .plan-description {
+    font-size: 0.95rem;
+    color: var(--text-color);
+    opacity: 0.85;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.plan-item .btn-select-plan {
+    display: block; /* Ocupa toda a largura do card do plano */
+    width: 100%;
+    margin-top: 10px;
+    /* Herda estilos de .btn .btn-secondary .btn-small */
+    /* Se precisar de ajustes específicos, adicione aqui: */
+    /* Exemplo: background: var(--accent-color); color: var(--dark-color); */
+}
+.plan-item .btn-select-plan:hover {
+    /* Exemplo: background: var(--secondary-color); color: var(--light-color); */
+}
+
+/* Botão de fechar para o modal de planos (herda .close-modal-icon-btn) */
+#close-subscription-plans-modal-btn {
+    /* Se precisar de ajustes específicos, podem ser feitos aqui. */
+    /* Por exemplo, se a cor padrão não contrastar bem com o novo modal. */
+}
+
+
+/* Responsividade para o modal de planos */
+@media (max-width: 768px) {
+    .subscription-plans-modal-content {
+        padding: 25px 20px; /* Menos padding em telas menores */
+        max-width: 95%;
+    }
+    #subscriptionBoxNameModalTitle {
+        font-size: 1.6rem; /* Título menor */
+    }
+    .plan-item h4 {
+        font-size: 1.1rem;
+    }
+    .plan-item .plan-price {
+        font-size: 1rem;
+    }
+    .plan-item .plan-description,
+    .plan-item .plan-billing-info {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    #subscriptionBoxNameModalTitle {
+        font-size: 1.4rem;
+        margin-bottom: 20px;
+    }
+    .plan-item {
+        padding: 15px;
+    }
+     .plan-item h4 {
+        font-size: 1.05rem;
+    }
+    .plan-item .btn-select-plan {
+        padding: 8px 15px; /* Ajusta o padding do botão interno se necessário */
+        font-size: 0.9rem;
+    }
+}
+/* Animação de pulsação para o botão do banner */
+@keyframes pulse-banner-btn {
+    0% {
+        transform: scale(1);
+        /* Sombra base do btn-primary */
+        box-shadow: 0 3px 0px rgba(var(--rgb-primary-color), 0.4),
+                    0 5px 8px rgba(var(--rgb-primary-color), 0.25),
+                    0 5px 8px rgba(0, 0, 0, 0.1);
+    }
+    50% {
+        transform: scale(1.05); /* Aumenta levemente o tamanho */
+        /* Sombras um pouco mais intensas ou espalhadas para efeito de "glow" */
+        box-shadow: 0 4px 0px rgba(var(--rgb-primary-color), 0.5),
+                    0 7px 12px rgba(var(--rgb-primary-color), 0.35),
+                    0 7px 12px rgba(0, 0, 0, 0.15),
+                    0 0 15px rgba(var(--rgb-primary-color), 0.3); /* Adiciona um brilho sutil */
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 3px 0px rgba(var(--rgb-primary-color), 0.4),
+                    0 5px 8px rgba(var(--rgb-primary-color), 0.25),
+                    0 5px 8px rgba(0, 0, 0, 0.1);
+    }
+}
+
+/* Aplicar a animação especificamente ao botão "Quero Minha Box!" no banner */
+.banner .btn.btn-primary.btn-large {
+    animation: pulse-banner-btn 2.5s infinite ease-in-out;
+}
