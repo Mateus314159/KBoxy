@@ -241,6 +241,20 @@ body {
         max-width: 100%;
     }
 }
+.address-card {
+  background-color: #fdfdfd;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  margin: 10px 0;
+  /* outras propriedades que criam o “design lindo” */
+}
+
+.address-card p {
+  margin: 6px 0;
+  font-size: 14px;
+  color: #333;
+}
 
 .saved-address-card {
     background-color: #f8f9fa; /* Cor de fundo suave */

@@ -27,8 +27,9 @@
             <div class="header-actions">
                 <button class="btn btn-primary" onclick="window.location.href='index.html#boxes'">Compre Agora</button>
                 <div class="user-action-container">
-                    <button id="login-action-button" class="header-icon-btn" aria-label="Menu do usuário">
-                        <i class="fas fa-user-circle"></i>
+                  <button id="login-action-button" class="header-icon-btn" aria-label="Menu do usuário">
+  <i class="fas fa-user-circle"></i>
+</button>
                     </button>
                     <div id="user-dropdown" class="user-dropdown-menu">
                     </div>
@@ -134,16 +135,32 @@
                     <div id="no-orders-message" style="display:none;"><p>Você ainda não fez nenhum pedido. Que tal começar pela sua primeira K-Boxy?</p></div>
                 </div>
 
-                <div id="enderecos" class="account-tab-content">
-                    <h2>Meus Endereços</h2>
-                    <div id="address-display-loading" style="display:none; padding: 15px;">Carregando seu endereço...</div>
-                    <div id="address-display-area">
-                    </div>
-                    <div id="no-address-saved-message" style="display:none; padding: 15px;">
-                        <p>Você ainda não cadastrou um endereço.</p>
-                        <p>Por favor, preencha seu endereço na aba <a href="#perfil" class="account-nav-link-inline" data-section="perfil">Meu Perfil</a>.</p>
-                    </div>
-                </div> 
+               <div id="enderecos" class="account-tab-content">
+    <h2>Meus Endereços</h2>
+
+    <div id="address-display-loading" style="display:none; padding: 15px;">
+        Carregando seu endereço...
+    </div>
+
+    <!-- Antes era apenas: <div id="address-display-area"></div> -->
+    <div id="address-display-area">
+        <!-- TEMPLATE que contém a estrutura que seu CSS estiliza -->
+        <div id="address-card" class="address-card" style="display:none;">
+            <p><strong>Endereço:</strong> <span id="addr-street"></span></p>
+            <p><strong>Complemento:</strong> <span id="addr-complement"></span></p>
+            <p><strong>Bairro:</strong> <span id="addr-neighborhood"></span></p>
+            <p><strong>Cidade / Estado:</strong> <span id="addr-citystate"></span></p>
+            <p><strong>CEP:</strong> <span id="addr-zipcode"></span></p>
+        </div>
+    </div>
+
+    <div id="no-address-saved-message" style="display:none; padding: 15px;">
+        <p>Você ainda não cadastrou um endereço.</p>
+        <p>Por favor, preencha seu endereço na aba 
+           <a href="#" class="account-nav-link-inline" data-section="perfil">Meu Perfil</a>.
+        </p>
+    </div>
+</div>
 
                 <div id="seguranca" class="account-tab-content"> 
                     <h2>Segurança</h2>

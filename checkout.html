@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout – K-boxy</title>
+    <meta name="description" content="Finalize sua compra na K-boxy e receba sua box misteriosa de K-pop!">
+
+    <!-- CSS principal e fontes -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/minha-conta.css">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Fredoka+One&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Preloader (igual ao index.html) -->
+    <div class="preloader">
+        <img src="images/logo-k-boxy-anim.svg" alt="K-boxy Logo Animado" class="preloader-logo">
+    </div>
+
+    <!-- Header idêntico ao index.html -->
+    <header class="header">
+        <div class="container">
+            <a href="index.html#home" class="logo">
+                <img src="images/logo.png" alt="Logo K-boxy">
+            </a>
+            <nav class="nav-menu">
+                <ul class="nav-list">
+                    <li><a href="index.html#home" class="nav-link">Home</a></li>
+                    <li><a href="index.html#sobre" class="nav-link">Sobre</a></li>
+                    <li><a href="index.html#boxes" class="nav-link">Boxes</a></li>
+                    <li><a href="index.html#contato" class="nav-link">Contato</a></li>
+                </ul>
+            </nav>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="scrollToSection('#boxes')">Compre Agora</button>
+                <div class="user-action-container">
+                    <button id="login-action-button" class="header-icon-btn" aria-label="Menu do usuário">
+                        <i class="fas fa-user-circle"></i>
+                    </button>
+                    <div id="user-dropdown" class="user-dropdown-menu">
+                        <a href="#" id="dropdown-login-link">Login</a>
+                        <a href="#" id="dropdown-register-link">Cadastrar</a>
+                    </div>
+                </div>
+                <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main do Checkout -->
+    <main class="section-padding" style="padding-top: calc(var(--header-height) + 40px);">
+        <div class="container" data-aos="fade-up">
+            <h1 class="section-title" style="margin-bottom: 30px;">Checkout</h1>
+            <div class="checkout-card" style="background-color: var(--card-bg-color); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 30px; max-width: 600px; margin: 0 auto; text-align: center;">
+                <p id="chosenPlanText" style="font-size: 1.2rem; margin-bottom: 25px; color: var(--dark-color);">
+                  Carregando informações do plano…
+                </p>
+                <button id="payButton" class="btn btn-primary btn-large">Ir para pagamento</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer idêntico ao index.html -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-about">
+                    <h3 class="footer-logo">K-boxy ✨</h3>
+                    <p>Sua dose mensal de felicidade K-Pop!</p>
+                    <p>&copy; <span id="currentYear"></span> K-boxy. Todos os direitos reservados.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Links Rápidos</h4>
+                    <ul>
+                        <li><a href="#sobre">Sobre Nós</a></li>
+                        <li><a href="#boxes">Nossas Boxes</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Política de Privacidade</a></li>
+                    </ul>
+                </div>
+                <div class="footer-social">
+                    <h4>Siga-nos</h4>
+                    <a href="#" target="_blank" aria-label="Instagram K-boxy"><i class="fab fa-instagram"></i></a>
+                    <a href="#" target="_blank" aria-label="TikTok K-boxy"><i class="fab fa-tiktok"></i></a>
+                    <a href="#" target="_blank" aria-label="YouTube K-boxy"><i class="fab fa-youtube"></i></a>
+                    <a href="#" target="_blank" aria-label="Twitter K-boxy"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to top -->
+    <button id="back-to-top" class="back-to-top-btn" title="Voltar ao topo">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Scripts gerais (AOS, Swiper, script.js original) -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script src="js/script.js"></script>
+
+    <!-- Script específico do Checkout -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const params = new URLSearchParams(window.location.search);
+        const planId = params.get('plan') || 'Não definido';
+
+        // Defina variáveis de exibição
+        let displayText = '';
+        let unitPrice = 0; // preço por box ou por mês
+        let duration = 1;  // número de meses (1 para compra única)
+
+        switch(planId) {
+          case 'firstLove':
+            displayText = 'K-BOXY First Love – Compra Única';
+            unitPrice = 69.90;
+            duration = 1;
+            break;
+          case 'fl_semi_annual':
+            displayText = 'K-BOXY First Love – Plano Semestral';
+            unitPrice = 54.90;
+            duration = 6;
+            break;
+          case 'fl_annual':
+            displayText = 'K-BOXY First Love – Plano Anual';
+            unitPrice = 49.90;
+            duration = 12;
+            break;
+
+          case 'idolBox':
+            displayText = 'K-BOXY Lover – Compra Única';
+            unitPrice = 79.90;
+            duration = 1;
+            break;
+          case 'il_semi_annual':
+            displayText = 'K-BOXY Lover – Plano Semestral';
+            unitPrice = 64.90;
+            duration = 6;
+            break;
+          case 'il_annual':
+            displayText = 'K-BOXY Lover – Plano Anual';
+            unitPrice = 59.90;
+            duration = 12;
+            break;
+
+          case 'legendBox':
+            displayText = 'K-BOXY True Love – Compra Única';
+            unitPrice = 99.90;
+            duration = 1;
+            break;
+          case 'tl_semi_annual':
+            displayText = 'K-BOXY True Love – Plano Semestral';
+            unitPrice = 84.90;
+            duration = 6;
+            break;
+          case 'tl_annual':
+            displayText = 'K-BOXY True Love – Plano Anual';
+            unitPrice = 79.90;
+            duration = 12;
+            break;
+
+          default:
+            displayText = 'Plano desconhecido';
+            unitPrice = 0.00;
+            duration = 1;
+        }
+
+        // Monta texto conforme tipo de plano
+        let chosenText = '';
+        if (duration === 1) {
+          // Compra única
+          chosenText = `${displayText} – R$ ${unitPrice.toFixed(2)}`;
+        } else {
+          // Assinatura semestral ou anual
+          chosenText = `${displayText} – R$ ${unitPrice.toFixed(2)} por mês durante ${duration} meses`;
+        }
+
+        document.getElementById('chosenPlanText').textContent = chosenText;
+
+        document.getElementById('payButton').addEventListener('click', async () => {
+          // Verifica se o usuário está logado (token no localStorage)
+          const token = localStorage.getItem('authToken');
+          if (!token) {
+            alert('Você precisa estar logado para continuar o pagamento.');
+            window.location.href = '/minha-conta.html';
+            return;
+          }
+
+          try {
+            // Envia os dados ao backend para criar preferência
+            const response = await fetch('/api/payment/create_preference', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                planId,
+                price: unitPrice.toFixed(2), // valor unitário (por mês ou único)
+                title: displayText,
+                description: displayText
+              })
+            });
+
+            if (!response.ok) {
+              throw new Error('Não foi possível criar a preferência de pagamento.');
+            }
+
+            const data = await response.json();
+            // Redireciona para o checkout do Mercado Pago
+            window.location.href = data.checkoutUrl;
+          } catch (err) {
+            console.error(err);
+            alert('Houve um erro ao tentar iniciar o pagamento. Tente novamente mais tarde.');
+          }
+        });
+      });
+    </script>
+</body>
+</html>

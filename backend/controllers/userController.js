@@ -32,17 +32,11 @@ exports.updateUserProfile = async (req, res) => {
     const userToUpdate = await User.findById(userId);
     if (!userToUpdate) {
       return res.status(404).json({ message: 'Usuário não encontrado.' });
-
     }
-
-    if (req.file) {
-  userToUpdate.avatarUrl = `/uploads/avatars/${req.file.filename}`;
-}
 
     if (name !== undefined) {
       userToUpdate.name = name;
     }
-    
 
     if (address) {
       if (!userToUpdate.address) {

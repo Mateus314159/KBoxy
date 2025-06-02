@@ -275,14 +275,20 @@ main {
     align-items: center;
     height: 100%;
 }
+/* ==========================================================
+   AVATAR NO CABEÇALHO
+========================================================== */
 .header-user-avatar {
-    width: 30px;  /* Ajuste o tamanho conforme seu design */
-    height: 30px; /* Ajuste o tamanho conforme seu design */
-    border-radius: 50%; /* Para imagem redonda */
-    object-fit: cover;   /* Para cobrir o espaço sem distorcer */
-    vertical-align: middle;
-    border: 1px solid var(--primary-color); /* Opcional: pequena borda */
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  vertical-align: middle;
+  border: 1px solid var(--primary-color);
+  /* caso queira espaço entre avatar e próximas letras/ícones */
+  margin-right: 4px;
 }
+
 
 .logo {
     text-decoration: none;

@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const navMenu = document.querySelector('.nav-menu');
     const navLinks = document.querySelectorAll('.nav-link');
 
-    // --- Setor video banner ---
+    // --- Setor vídeo banner ---
     const introVideo = document.getElementById('intro-video');
     const bannerContent = document.querySelector('#home .banner-content');
 
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- Seletor do Ano no Rodapé ---
     const currentYearSpan = document.getElementById('currentYear');
 
-     // --- Carrossel Swiper para Boxes Mobile ---
+    // --- Carrossel Swiper para Boxes Mobile ---
     const boxCarouselMobile = document.querySelector('.box-carousel-mobile');
     const swiperWrapper = boxCarouselMobile ? boxCarouselMobile.querySelector('.swiper-wrapper') : null;
     const desktopBoxCards = document.querySelectorAll('.boxes-grid .box-card');
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
         legendBox: {
             name: "K-BOXY True Love (Detalhes)",
             price: "R$ 99,90 (Preço base)",
-            image: "images/TLcapa.png", // Placeholder, ajuste se tiver a imagem
+            image: "images/TLcapa.png",
             size: "30 x 25 x 15 cm",
             minItems: 10,
             description: "Uma caixa especial que celebra o amor verdadeiro! Descrição detalhada da K-BOXY True Love.",
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-   // --- Dados dos Planos de Assinatura ---
+    // --- Dados dos Planos de Assinatura ---
     const subscriptionPlansData = {
         firstLove: {
             displayName: "K-BOXY First Love",
@@ -181,13 +181,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 // Para os outros links, apenas fechar o dropdown ao clicar, pois a navegação é via href
-                // É importante que os IDs sejam únicos se você for adicionar event listeners específicos
-                // Se o comportamento padrão de seguir o href é suficiente, não precisa de listeners aqui.
                 const dropdownLinks = currentUserDropdownMenu.querySelectorAll('a.user-dropdown-link');
-                 dropdownLinks.forEach(link => {
+                dropdownLinks.forEach(link => {
                     if (link.id !== 'dropdown-logout-link') {
                         link.addEventListener('click', function() {
-                            // A navegação ocorrerá pelo href. Apenas fechamos o dropdown.
                             if (currentUserDropdownMenu.classList.contains('active')) {
                                 currentUserDropdownMenu.classList.remove('active');
                             }
@@ -276,7 +273,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function openBoxModal(boxId) { // Esta função não existe no código original, mantendo como referência de estrutura
+    function openBoxModal(boxId) {
         const details = boxDetailsData[boxId];
         if (details && boxDetailsModal) {
             if(modalBoxImage) modalBoxImage.src = details.image || 'https://via.placeholder.com/400x300/ccc/000?text=Imagem+Indisponível';
@@ -327,9 +324,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 planElement.dataset.boxType = boxId; // Ex: "firstLove"
 
                 let planPriceInfo = `<p class="plan-price">${plan.price}</p>`;
-                // if (plan.billing) { // Se você tiver informações de cobrança adicionais
-                //     planPriceInfo += `<p class="plan-billing-info">${plan.billing}</p>`;
-                // }
 
                 planElement.innerHTML = `
                     <h4>${plan.name}</h4>
@@ -341,7 +335,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 planElement.querySelector('.btn-select-plan').addEventListener('click', function() {
                     const selectedBoxType = this.closest('.plan-item').dataset.boxType;
                     const selectedPlanId = this.closest('.plan-item').dataset.planId;
-                    createOrder(selectedBoxType, selectedPlanId); // Passa o ID do plano (ex: "fl_monthly")
+                    createOrder(selectedBoxType, selectedPlanId); // Agora redireciona para /purchase?plan=
                     closeSubscriptionPlansModal();
                 });
                 subscriptionPlansListElem.appendChild(planElement);
@@ -382,7 +376,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             fetch(`${API_BASE_URL}/auth/login`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),
             })
             .then(response => response.json().then(data => ({ status: response.status, body: data })))
@@ -408,9 +402,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     if (toggleLoginPasswordBtn && loginPasswordInput) {
-        toggleLoginPasswordBtn.addEventListener('click', function() { const type = loginPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password'; loginPasswordInput.setAttribute('type', type); this.classList.toggle('fa-eye'); this.classList.toggle('fa-eye-slash'); });
+        toggleLoginPasswordBtn.addEventListener('click', function() {
+            const type = loginPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            loginPasswordInput.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
     }
-    if (closeLoginModalBtnElem) { closeLoginModalBtnElem.addEventListener('click', closeLoginModal); }
+    if (closeLoginModalBtnElem) {
+        closeLoginModalBtnElem.addEventListener('click', closeLoginModal);
+    }
 
     if (registerForm) {
         registerForm.addEventListener('submit', function(event) {
@@ -431,7 +432,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             fetch(`${API_BASE_URL}/auth/register`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: email, password: password }), // O backend pode precisar de 'name' também
             })
             .then(response => response.json().then(data => ({ status: response.status, body: data })))
@@ -451,20 +452,53 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     if (toggleRegisterPasswordBtn && registerPasswordInput) {
-        toggleRegisterPasswordBtn.addEventListener('click', function() { const type = registerPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password'; registerPasswordInput.setAttribute('type', type); this.classList.toggle('fa-eye'); this.classList.toggle('fa-eye-slash'); });
+        toggleRegisterPasswordBtn.addEventListener('click', function() {
+            const type = registerPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            registerPasswordInput.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
     }
     if (toggleRegisterConfirmPasswordBtn && registerConfirmPasswordInput) {
-        toggleRegisterConfirmPasswordBtn.addEventListener('click', function() { const type = registerConfirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password'; registerConfirmPasswordInput.setAttribute('type', type); this.classList.toggle('fa-eye'); this.classList.toggle('fa-eye-slash'); });
+        toggleRegisterConfirmPasswordBtn.addEventListener('click', function() {
+            const type = registerConfirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            registerConfirmPasswordInput.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
     }
-    if (closeRegisterModalBtnElem) { closeRegisterModalBtnElem.addEventListener('click', closeRegisterModal); }
+    if (closeRegisterModalBtnElem) {
+        closeRegisterModalBtnElem.addEventListener('click', closeRegisterModal);
+    }
 
     if (switchToRegisterBtnFromLogin) {
-        switchToRegisterBtnFromLogin.addEventListener('click', function(e) { e.preventDefault(); closeLoginModal(); openRegisterModal(); });
+        switchToRegisterBtnFromLogin.addEventListener('click', function(e) {
+            e.preventDefault();
+            closeLoginModal();
+            openRegisterModal();
+        });
     }
     if (switchToLoginBtnFromRegister) {
-        switchToLoginBtnFromRegister.addEventListener('click', function(e) { e.preventDefault(); closeRegisterModal(); openLoginModal(); });
+        switchToLoginBtnFromRegister.addEventListener('click', function(e) {
+            e.preventDefault();
+            closeRegisterModal();
+            openLoginModal();
+        });
     }
 
+    // Modificamos aqui: ao invés de criar o pedido via fetch, redirecionamos para /purchase
+    function createOrder(boxType, planIdForBackend) {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            alert('Você precisa estar logado para iniciar o checkout.');
+            openLoginModal();
+            return;
+        }
+        // Redireciona para a rota de checkout, passando o ID do plano
+        window.location.href = `/purchase?plan=${planIdForBackend}`;
+    }
+
+    // Agora, o botão “Assinar” em cada card abre o modal de planos
     const subscribeButtons = document.querySelectorAll('.box-card .btn-ver-mais');
     if (subscribeButtons) {
         subscribeButtons.forEach(button => {
@@ -472,49 +506,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 const boxCard = this.closest('.box-card');
                 if (boxCard) {
                     const boxId = boxCard.dataset.boxid;
-                    if (boxId) openSubscriptionPlansModal(boxId);
-                    else console.error("data-boxid não encontrado no card.");
+                    if (boxId) {
+                        openSubscriptionPlansModal(boxId);
+                    } else {
+                        console.error("data-boxid não encontrado no card.");
+                    }
                 }
             });
         });
     }
-    if (closeSubscriptionPlansModalBtn) closeSubscriptionPlansModalBtn.addEventListener('click', closeSubscriptionPlansModal);
-    if (closeBoxDetailsModalBtn) closeBoxDetailsModalBtn.addEventListener('click', closeBoxDetailsModal);
-
-
-    function createOrder(boxType, planIdForBackend) { // Nome do segundo parâmetro alterado para clareza
-        const token = localStorage.getItem('authToken');
-        if (!token) {
-            alert('Você precisa estar logado para fazer um pedido.');
-            openLoginModal();
-            return;
-        }
-
-        console.log("Dados para criar pedido:", { boxType, planType: planIdForBackend }); // planType no backend é o ID do plano
-
-        fetch(`${API_BASE_URL}/orders`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': token
-            },
-            body: JSON.stringify({ boxType: boxType, planType: planIdForBackend })
-        })
-        .then(response => response.json().then(data => ({ status: response.status, body: data })))
-        .then(({ status, body }) => {
-            if (status === 201) {
-                alert('Pedido criado com sucesso!');
-                console.log('Pedido criado:', body);
-                // Idealmente, redirecionar ou mostrar confirmação mais elaborada
-                // Ex: window.location.href = 'confirmacao-pedido.html?orderId=' + body.id;
-            } else {
-                alert(body.message || body.error || 'Erro ao criar pedido.');
-            }
-        })
-        .catch(error => {
-            console.error('Erro ao criar pedido:', error);
-            alert('Ocorreu um erro ao criar seu pedido.');
-        });
+    if (closeSubscriptionPlansModalBtn) {
+        closeSubscriptionPlansModalBtn.addEventListener('click', closeSubscriptionPlansModal);
+    }
+    if (closeBoxDetailsModalBtn) {
+        closeBoxDetailsModalBtn.addEventListener('click', closeBoxDetailsModal);
     }
 
     // =========================================================================
@@ -577,21 +582,38 @@ document.addEventListener('DOMContentLoaded', function() {
     if (menuToggle && navMenu) {
         let openIcon = menuToggle.querySelector('.fa-bars');
         let closeIconElement = menuToggle.querySelector('.fa-times');
-        if (!openIcon) { openIcon = document.createElement('i'); openIcon.classList.add('fas', 'fa-bars'); menuToggle.prepend(openIcon); }
-        if (!closeIconElement) { closeIconElement = document.createElement('i'); closeIconElement.classList.add('fas', 'fa-times'); closeIconElement.style.display = 'none'; menuToggle.appendChild(closeIconElement); }
+        if (!openIcon) {
+            openIcon = document.createElement('i');
+            openIcon.classList.add('fas', 'fa-bars');
+            menuToggle.prepend(openIcon);
+        }
+        if (!closeIconElement) {
+            closeIconElement = document.createElement('i');
+            closeIconElement.classList.add('fas', 'fa-times');
+            closeIconElement.style.display = 'none';
+            menuToggle.appendChild(closeIconElement);
+        }
 
         menuToggle.addEventListener('click', () => {
             navMenu.classList.toggle('active');
             menuToggle.classList.toggle('active');
             body.classList.toggle('no-scroll');
-            if (navMenu.classList.contains('active')) { openIcon.style.display = 'none'; closeIconElement.style.display = 'block'; }
-            else { openIcon.style.display = 'block'; closeIconElement.style.display = 'none'; }
+            if (navMenu.classList.contains('active')) {
+                openIcon.style.display = 'none';
+                closeIconElement.style.display = 'block';
+            } else {
+                openIcon.style.display = 'block';
+                closeIconElement.style.display = 'none';
+            }
         });
         navLinks.forEach(link => {
             link.addEventListener('click', () => {
                 if (navMenu.classList.contains('active')) {
-                    navMenu.classList.remove('active'); menuToggle.classList.remove('active'); body.classList.remove('no-scroll');
-                    openIcon.style.display = 'block'; closeIconElement.style.display = 'none';
+                    navMenu.classList.remove('active');
+                    menuToggle.classList.remove('active');
+                    body.classList.remove('no-scroll');
+                    openIcon.style.display = 'block';
+                    closeIconElement.style.display = 'none';
                 }
             });
         });
@@ -607,12 +629,16 @@ document.addEventListener('DOMContentLoaded', function() {
             if (href.length > 1 && href.startsWith('#')) {
                 const targetElement = document.querySelector(href);
                 if (targetElement) {
-                    e.preventDefault(); scrollToSection(href);
+                    e.preventDefault();
+                    scrollToSection(href);
                     if (navMenu && navMenu.classList.contains('active')) {
-                        navMenu.classList.remove('active'); if(menuToggle) menuToggle.classList.remove('active'); body.classList.remove('no-scroll');
+                        navMenu.classList.remove('active');
+                        if(menuToggle) menuToggle.classList.remove('active');
+                        body.classList.remove('no-scroll');
                         const openIcon = menuToggle ? menuToggle.querySelector('.fa-bars') : null;
                         const closeIconElement = menuToggle ? menuToggle.querySelector('.fa-times') : null;
-                        if(openIcon) openIcon.style.display = 'block'; if(closeIconElement) closeIconElement.style.display = 'none';
+                        if(openIcon) openIcon.style.display = 'block';
+                        if(closeIconElement) closeIconElement.style.display = 'none';
                     }
                 }
             }
@@ -625,23 +651,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (boxCarouselMobile && swiperWrapper && desktopBoxCards.length > 0) {
         desktopBoxCards.forEach(card => {
-            const swiperSlide = document.createElement('div'); swiperSlide.classList.add('swiper-slide');
-            const clonedCard = card.cloneNode(true); swiperSlide.appendChild(clonedCard);
+            const swiperSlide = document.createElement('div');
+            swiperSlide.classList.add('swiper-slide');
+            const clonedCard = card.cloneNode(true);
+            swiperSlide.appendChild(clonedCard);
             swiperWrapper.appendChild(swiperSlide);
         });
         new Swiper('.box-carousel-mobile', {
-            slidesPerView: 1, spaceBetween: 15, loop: false, grabCursor: true,
-            pagination: { el: '.swiper-pagination', clickable: true, },
-            navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev', },
+            slidesPerView: 1,
+            spaceBetween: 15,
+            loop: false,
+            grabCursor: true,
+            pagination: { el: '.swiper-pagination', clickable: true },
+            navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
             breakpoints: { 480: { slidesPerView: 1.2, spaceBetween: 20 }, 640: { slidesPerView: 1.5, spaceBetween: 20 } },
-            on: { init: () => { if (typeof AOS !== 'undefined' && AOS) AOS.refreshHard(); } }
+            on: {
+                init: () => {
+                    if (typeof AOS !== 'undefined' && AOS) AOS.refreshHard();
+                }
+            }
         });
     } else {
         // Warnings sobre elementos não encontrados para o carrossel
     }
 
     const initialLoginActionButton = document.getElementById('login-action-button');
-    // const initialUserDropdownMenu = document.getElementById('user-dropdown'); // Removido, pego dinamicamente
 
     if (initialLoginActionButton) {
         initialLoginActionButton.addEventListener('click', function(event) {
@@ -657,9 +691,11 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('click', function(event) {
         const currentDropdownMenu = document.getElementById('user-dropdown');
         const currentLoginActionButton = document.getElementById('login-action-button'); // Re-seleciona
-        if (currentDropdownMenu && currentDropdownMenu.classList.contains('active') &&
+        if (
+            currentDropdownMenu && currentDropdownMenu.classList.contains('active') &&
             !currentDropdownMenu.contains(event.target) &&
-            currentLoginActionButton && !currentLoginActionButton.contains(event.target)) {
+            currentLoginActionButton && !currentLoginActionButton.contains(event.target)
+        ) {
             currentDropdownMenu.classList.remove('active');
         }
     });
@@ -694,14 +730,12 @@ document.addEventListener('DOMContentLoaded', function() {
     if (currentYearSpan) currentYearSpan.textContent = new Date().getFullYear();
 
     window.addEventListener('scroll', () => {
-        if(typeof handleScrollHeader === 'function') handleScrollHeader();
-        if(typeof handleBackToTopButton === 'function') handleBackToTopButton();
+        if (typeof handleScrollHeader === 'function') handleScrollHeader();
+        if (typeof handleBackToTopButton === 'function') handleBackToTopButton();
     });
 
-    if(typeof handleScrollHeader === 'function') handleScrollHeader();
-    if(typeof handleBackToTopButton === 'function') handleBackToTopButton();
+    if (typeof handleScrollHeader === 'function') handleScrollHeader();
+    if (typeof handleBackToTopButton === 'function') handleBackToTopButton();
     updateUIAfterLogin(); // Chamada inicial
-
-    
 
 }); // Fim do DOMContentLoaded

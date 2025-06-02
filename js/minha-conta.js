@@ -1,369 +1,331 @@
 // js/minha-conta.js
+
 document.addEventListener('DOMContentLoaded', function () {
-    const API_BASE_URL = 'http://localhost:5000/api'; // CONFIRME SUA URL DA API
+    const API_BASE_URL = 'http://localhost:5000/api'; // ajuste se necessário
     const token = localStorage.getItem('authToken');
 
-    // Elementos da UI
-    const userAvatarImg = document.getElementById('user-avatar-img');
-    const avatarUploadInput = document.getElementById('avatar-upload-input');
-    const userAccountName = document.getElementById('user-account-name');
-    const userAccountEmail = document.getElementById('user-account-email');
-    const profileInputName = document.getElementById('profile-input-name');
-    const profileInputEmail = document.getElementById('profile-input-email');
-    const profileUpdateForm = document.getElementById('profile-update-form');
+    // ------------------------------
+    // 1) Elementos da interface
+    // ------------------------------
+    const userAvatarImg      = document.getElementById('user-avatar-img');
+    const avatarUploadInput  = document.getElementById('avatar-upload-input');
+    const userAccountName    = document.getElementById('user-account-name');
+    const userAccountEmail   = document.getElementById('user-account-email');
 
-    const profileInputStreet = document.getElementById('profile-input-street');
+    const profileInputName    = document.getElementById('profile-input-name');
+    const profileInputEmail   = document.getElementById('profile-input-email');
+    const profileInputStreet  = document.getElementById('profile-input-street');
     const profileInputComplement = document.getElementById('profile-input-complement');
     const profileInputNeighborhood = document.getElementById('profile-input-neighborhood');
-    const profileInputCity = document.getElementById('profile-input-city');
-    const profileInputState = document.getElementById('profile-input-state');
+    const profileInputCity    = document.getElementById('profile-input-city');
+    const profileInputState   = document.getElementById('profile-input-state');
     const profileInputZipcode = document.getElementById('profile-input-zipcode');
+    const profileUpdateForm   = document.getElementById('profile-update-form');
 
-    const addressDisplayLoading = document.getElementById('address-display-loading');
-    const addressDisplayArea = document.getElementById('address-display-area');
-    const noAddressSavedMessage = document.getElementById('no-address-saved-message');
-
-
-    const subscriptionInfoLoading = document.getElementById('subscription-info-loading');
+    // Aba “Sua Assinatura”
+    const subscriptionLoadingDiv       = document.getElementById('subscription-info-loading');
     const activeSubscriptionDetailsDiv = document.getElementById('active-subscription-details');
-    const noActiveSubscriptionDiv = document.getElementById('no-active-subscription');
+    const noActiveSubscriptionDiv      = document.getElementById('no-active-subscription');
 
-    const ordersListContainer = document.getElementById('orders-list-container');
-    const noOrdersMessage = document.getElementById('no-orders-message');
+    // Aba “Meus Pedidos”
+    const ordersListContainer  = document.getElementById('orders-list-container');
+    const noOrdersMessageDiv   = document.getElementById('no-orders-message');
 
+    // Aba “Endereços”
+    const addressLoadingDiv     = document.getElementById('address-display-loading');
+    const addressDisplayAreaDiv = document.getElementById('address-display-area');
+    const noAddressMessageDiv   = document.getElementById('no-address-saved-message');
+
+    // Aba “Segurança” (alterar senha)
     const changePasswordFormAccount = document.getElementById('change-password-form-account');
-    const accountPageLogoutBtn = document.getElementById('account-page-logout');
 
-    // Abas de Navegação
-    const navLinks = document.querySelectorAll('.account-navigation a[data-section]');
+    // Elementos de navegação de abas
     const contentSections = document.querySelectorAll('.account-tab-content');
+    const navLinks        = document.querySelectorAll('.account-navigation a');
 
-    document.body.addEventListener('click', function(event) {
-        if (event.target.matches('.account-nav-link-inline')) {
-            event.preventDefault();
-            const sectionId = event.target.dataset.section;
-            if (sectionId) {
-                window.location.hash = sectionId;
-            }
-        }
-    });
-
-    if (!token) {
-        alert('Você precisa estar logado para acessar esta página.');
-        window.location.href = 'index.html';
-        return;
-    }
-
-    function setActiveTab(sectionId) {
-        navLinks.forEach(link => {
-            link.classList.toggle('active-account-tab', link.dataset.section === sectionId);
-        });
-        contentSections.forEach(section => {
-            section.classList.toggle('active-content', section.id === sectionId);
-        });
-
-        if (sectionId === 'assinatura') fetchSubscriptionInfo();
-        if (sectionId === 'pedidos') fetchUserOrders();
-        // A aba de endereços é populada pelo fetchUserProfile, que é chamado na inicialização
-        // e quando o perfil é atualizado. Se precisar de atualização dinâmica ao clicar na aba, adicione aqui.
-    }
-
-    navLinks.forEach(link => {
-        link.addEventListener('click', function (e) {
-            e.preventDefault();
-            const sectionId = this.dataset.section;
-            window.location.hash = sectionId;
-        });
-    });
-
-    if(accountPageLogoutBtn) {
-        accountPageLogoutBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (typeof window.handleLogout === 'function') {
-                window.handleLogout();
-                window.location.href = 'index.html';
-            } else {
-                localStorage.removeItem('authToken');
-                localStorage.removeItem('userId');
-                localStorage.removeItem('userAvatarUrl');
-                alert('Você foi desconectado.');
-                window.location.href = 'index.html';
-            }
-        });
-    }
-
+    // ------------------------------
+    // 2) Função para buscar perfil
+    // ------------------------------
     async function fetchUserProfile() {
         try {
             const response = await fetch(`${API_BASE_URL}/users/me`, {
                 headers: { 'Authorization': token }
             });
-            if (!response.ok) throw new Error('Não foi possível carregar os dados do perfil.');
+            if (!response.ok) throw new Error('Não foi possível carregar dados do perfil.');
+
             const userData = await response.json();
+            // Exibe nome e email no topo
+            userAccountName.textContent  = userData.name || '';
+            userAccountEmail.textContent = userData.email || '';
+            profileInputEmail.value = userData.email || '';
+            profileInputName.value  = userData.name || '';
 
-            if (userAccountName) userAccountName.textContent = userData.name || 'K-Popper';
-            if (userAccountEmail) userAccountEmail.textContent = userData.email;
-            if (profileInputName) profileInputName.value = userData.name || '';
-            if (profileInputEmail) profileInputEmail.value = userData.email;
-            if (userAvatarImg && userData.avatarUrl) {
-                userAvatarImg.src = userData.avatarUrl;
-            } else if (userAvatarImg) {
-                userAvatarImg.src = 'https://placehold.co/100x100/f8bbd0/1A1A1A?text=K&font=Poppins';
-            }
-
+            // Preenche formulário “Meu Perfil”
             if (userData.address) {
-                if (profileInputStreet) profileInputStreet.value = userData.address.street || '';
-                if (profileInputComplement) profileInputComplement.value = userData.address.complement || '';
-                if (profileInputNeighborhood) profileInputNeighborhood.value = userData.address.neighborhood || '';
-                if (profileInputCity) profileInputCity.value = userData.address.city || '';
-                if (profileInputState) profileInputState.value = userData.address.state || '';
-                if (profileInputZipcode) profileInputZipcode.value = userData.address.zipcode || '';
-            } else {
-                if (profileInputStreet) profileInputStreet.value = '';
-                if (profileInputComplement) profileInputComplement.value = '';
-                if (profileInputNeighborhood) profileInputNeighborhood.value = '';
-                if (profileInputCity) profileInputCity.value = '';
-                if (profileInputState) profileInputState.value = '';
-                if (profileInputZipcode) profileInputZipcode.value = '';
+                profileInputStreet.value       = userData.address.street       || '';
+                profileInputComplement.value   = userData.address.complement   || '';
+                profileInputNeighborhood.value = userData.address.neighborhood || '';
+                profileInputCity.value         = userData.address.city         || '';
+                profileInputState.value        = userData.address.state        || '';
+                profileInputZipcode.value      = userData.address.zipcode      || '';
             }
-            displaySavedAddress(userData.address);
-        } catch (error) {
-            console.error("Erro ao carregar perfil:", error);
-            if(userAccountName) userAccountName.textContent = "Erro ao carregar";
+
+            // Carrega foto de avatar (se existir)
+            if (userData.avatarUrl) {
+                // A rota do backend expõe as imagens em /uploads/avatars/...
+                userAvatarImg.src = `${API_BASE_URL.replace('/api', '')}${userData.avatarUrl}`;
+            }
+
+            // EXIBIR o endereço na aba “Endereços”
+            displayUserAddress(userData.address);
+
+            // EXIBIR os pedidos na aba “Meus Pedidos”
+            fetchUserOrders();
+
+            // EXIBIR mensagem de “não ativo” na aba “Sua Assinatura”
+            displayUserSubscription(); 
+            // (atualmente sempre mostra “não é assinante”, pois esse backend não possui rota de assinatura)
+
+        } catch (err) {
+            console.error('Erro ao buscar perfil:', err);
         }
     }
 
+    // ------------------------------
+    // 3) Enviar atualização de perfil
+    // ------------------------------
     if (profileUpdateForm) {
-        profileUpdateForm.addEventListener('submit', async function(e) {
+        profileUpdateForm.addEventListener('submit', async function (e) {
             e.preventDefault();
-            const name = profileInputName.value;
-            const address = {
-                street: profileInputStreet.value.trim(),
-                complement: profileInputComplement.value.trim(),
-                neighborhood: profileInputNeighborhood.value.trim(),
-                city: profileInputCity.value.trim(),
-                state: profileInputState.value.trim().toUpperCase(),
-                zipcode: profileInputZipcode.value.trim()
+
+            const updatedData = {
+                name: profileInputName.value,
+                address: {
+                    street: profileInputStreet.value,
+                    complement: profileInputComplement.value,
+                    neighborhood: profileInputNeighborhood.value,
+                    city: profileInputCity.value,
+                    state: profileInputState.value,
+                    zipcode: profileInputZipcode.value
+                }
             };
 
             try {
-                // ***** INÍCIO DA CORREÇÃO DE SINTAXE *****
                 const response = await fetch(`${API_BASE_URL}/users/me`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': token },
-                    body: JSON.stringify({ name, address })
-                }); // Ponto e vírgula ou fechamento do parêntese do fetch aqui
-
-                if (!response.ok) { // O 'if' vem DEPOIS do objeto de opções do fetch
-                    const errData = await response.json().catch(() => ({ message: "Erro ao ler resposta do servidor." })); // Trata caso o corpo do erro não seja JSON
-                    throw new Error(errData.message || "Erro ao atualizar perfil.");
-                }
-                // ***** FIM DA CORREÇÃO DE SINTAXE *****
-                alert('Perfil atualizado com sucesso!');
-                fetchUserProfile();
-            } catch (error) {
-                console.error("Erro ao atualizar perfil:", error);
-                alert(error.message);
-            }
-        });
-    }
-
-    function displaySavedAddress(addressData) {
-        if (addressDisplayLoading) addressDisplayLoading.style.display = 'none';
-
-        if (addressData && (addressData.street || addressData.city || addressData.zipcode)) {
-            if (addressDisplayArea) {
-                // ***** INÍCIO DA CORREÇÃO DO TEMPLATE STRING *****
-                addressDisplayArea.innerHTML = `
-                    <div class="saved-address-card">
-                        <h4>Seu Endereço Principal <i class="fas fa-map-pin"></i></h4>
-                        <p>${addressData.street || 'Não informado'}</p>
-                        ${addressData.complement ? `<p>${addressData.complement}</p>` : ''}
-                        <p>${addressData.neighborhood || 'Bairro não informado'} - ${addressData.city || 'Cidade não informada'}/${addressData.state || 'UF'}</p>
-                        <p>CEP: ${addressData.zipcode || 'Não informado'}</p>
-                        <button class="btn btn-secondary btn-small" id="edit-address-from-display">Editar na Aba Perfil</button>
-                    </div>
-                `;
-                // ***** FIM DA CORREÇÃO DO TEMPLATE STRING *****
-                const editBtn = document.getElementById('edit-address-from-display');
-                if(editBtn) {
-                    editBtn.addEventListener('click', () => {
-                        window.location.hash = 'perfil';
-                        // setActiveTab('perfil'); // Pode chamar diretamente também se quiser evitar a mudança de hash momentânea
-                    });
-                }
-                addressDisplayArea.style.display = 'block';
-            }
-            if (noAddressSavedMessage) noAddressSavedMessage.style.display = 'none';
-        } else {
-            if (addressDisplayArea) {
-                addressDisplayArea.innerHTML = '';
-                addressDisplayArea.style.display = 'none';
-            }
-            if (noAddressSavedMessage) noAddressSavedMessage.style.display = 'block';
-        }
-    }
-
-    if (avatarUploadInput) {
-        avatarUploadInput.addEventListener('change', async function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            const formData = new FormData();
-            formData.append('avatar', file);
-
-            try {
-                const response = await fetch(`${API_BASE_URL}/users/me/avatar`, {
-                    method: 'POST',
-                    headers: { 'Authorization': token },
-                    body: formData
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token
+                    },
+                    body: JSON.stringify(updatedData)
                 });
                 if (!response.ok) {
-                    const errData = await response.json().catch(() => ({ message: "Erro ao ler resposta do servidor." }));
-                    throw new Error(errData.message || "Erro ao enviar foto.");
+                    const errJson = await response.json().catch(() => ({}));
+                    throw new Error(errJson.message || 'Erro ao atualizar perfil.');
                 }
-                const result = await response.json();
-                if (userAvatarImg) userAvatarImg.src = result.avatarUrl;
-                localStorage.setItem('userAvatarUrl', result.avatarUrl);
-                if (typeof window.updateUIAfterLogin === 'function') {
-                    window.updateUIAfterLogin();
-                }
-                alert('Foto de perfil atualizada!');
-            } catch (error) {
-                console.error("Erro ao enviar foto:", error);
-                alert(error.message);
+                const respData = await response.json();
+                alert('Perfil atualizado com sucesso!');
+                userAccountName.textContent = respData.name || '';
+                // Atualiza visualização em “Endereços” automaticamente
+                displayUserAddress(respData.address);
+            } catch (err) {
+                console.error('Erro ao atualizar perfil:', err);
+                alert(err.message);
             }
         });
     }
 
-    async function fetchSubscriptionInfo() {
-        if(subscriptionInfoLoading) subscriptionInfoLoading.style.display = 'block';
-        if(activeSubscriptionDetailsDiv) activeSubscriptionDetailsDiv.style.display = 'none';
-        if(noActiveSubscriptionDiv) noActiveSubscriptionDiv.style.display = 'none';
+  // 4) Upload de avatar
+// ------------------------------
+if (avatarUploadInput) {
+  avatarUploadInput.addEventListener('change', async function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
 
-        try {
-            const response = await fetch(`${API_BASE_URL}/subscriptions/me`, {
-                headers: { 'Authorization': token }
-            });
+    const formData = new FormData();
+    formData.append('avatar', file);
 
-            if (response.status === 404) {
-                if(noActiveSubscriptionDiv) noActiveSubscriptionDiv.style.display = 'block';
-                return;
-            }
-            if (!response.ok) throw new Error('Não foi possível carregar os dados da assinatura.');
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/me/avatar`, {
+        method: 'POST',
+        headers: { 'Authorization': token },
+        body: formData
+      });
+      if (!response.ok) {
+        const errJson = await response.json().catch(() => ({}));
+        throw new Error(errJson.message || 'Erro ao enviar foto.');
+      }
+      const data = await response.json();
 
-            const subData = await response.json();
+      // Atualiza <img> do avatar nesta página
+      userAvatarImg.src = `${API_BASE_URL.replace('/api', '')}${data.avatarUrl}`;
 
-            if(activeSubscriptionDetailsDiv) {
-                activeSubscriptionDetailsDiv.innerHTML = `
-                    <p><strong>Plano:</strong> <span id="sub-plan-name">${subData.planName || "N/A"}</span></p>
-                    <p><strong>Status:</strong> <span id="sub-status" class="status-${subData.status || 'unknown'}">${subData.status === 'active' ? 'Ativa' : 'Inativa/Expirada'}</span></p>
-                    <p><strong>Válida até:</strong> <span id="sub-expiry-date">${subData.expiryDate ? new Date(subData.expiryDate).toLocaleDateString('pt-BR') : "N/A"}</span></p>
-                `;
-                if(subData.benefits && subData.benefits.length > 0) {
-                    let benefitsHTML = '<div class="subscription-benefits"><h4>Benefícios Exclusivos do seu Plano:</h4><ul>';
-                    subData.benefits.forEach(benefit => {
-                        benefitsHTML += `<li><i class="fas fa-check-circle"></i> ${benefit}</li>`;
-                    });
-                    benefitsHTML += '</ul></div>';
-                    activeSubscriptionDetailsDiv.insertAdjacentHTML('beforeend', benefitsHTML);
-                }
-                activeSubscriptionDetailsDiv.style.display = 'block';
-            }
-        } catch (error) {
-            console.error("Erro ao carregar assinatura:", error);
-            if(activeSubscriptionDetailsDiv) activeSubscriptionDetailsDiv.innerHTML = `<p>Ocorreu um erro ao buscar sua assinatura.</p>`;
-            if(activeSubscriptionDetailsDiv) activeSubscriptionDetailsDiv.style.display = 'block';
-        } finally {
-            if(subscriptionInfoLoading) subscriptionInfoLoading.style.display = 'none';
-        }
+      // ==== ADICIONE ESSES DOIS TRECHOS ABAIXO ====
+      localStorage.setItem('userAvatarUrl', `${API_BASE_URL.replace('/api', '')}${data.avatarUrl}`);
+      if (window.updateUIAfterLogin) {
+        window.updateUIAfterLogin();
+      }
+      // ===========================================
+
+      alert('Foto de perfil atualizada com sucesso!');
+    } catch (err) {
+      console.error('Erro ao enviar foto de perfil:', err);
+      alert(err.message);
+    }
+  });
+}
+
+    // ------------------------------
+    // 5) Função para exibir “Sua Assinatura”
+    //    (aqui, exibe sempre “não ativo”)
+    // ------------------------------
+    function displayUserSubscription() {
+        // como não há rota de subscription no back-end, simulamos sempre sem assinatura
+        subscriptionLoadingDiv.style.display = 'none';
+        activeSubscriptionDetailsDiv.style.display = 'none';
+        noActiveSubscriptionDiv.style.display = 'block';
     }
 
+    // ------------------------------
+    // 6) Função para buscar “Meus Pedidos”
+    //    Rota: GET /api/orders/my
+    // ------------------------------
     async function fetchUserOrders() {
-        if(ordersListContainer) ordersListContainer.innerHTML = 'Carregando seus pedidos...';
-        if(noOrdersMessage) noOrdersMessage.style.display = 'none';
-
+        ordersListContainer.innerHTML = '';
+        noOrdersMessageDiv.style.display = 'none';
         try {
-            const response = await fetch(`${API_BASE_URL}/orders`, {
+            const response = await fetch(`${API_BASE_URL}/orders/my`, {
                 headers: { 'Authorization': token }
             });
-            if (!response.ok) throw new Error('Não foi possível carregar seus pedidos.');
+            if (!response.ok) throw new Error('Erro ao buscar pedidos.');
             const orders = await response.json();
 
-            if(ordersListContainer) ordersListContainer.innerHTML = '';
+            if (Array.isArray(orders) && orders.length > 0) {
+                // Para cada pedido, criamos um card simples
+                orders.forEach(order => {
+                    const divCard = document.createElement('div');
+                    divCard.classList.add('order-card');
+                    divCard.style.border = '1px solid #ddd';
+                    divCard.style.padding = '12px';
+                    divCard.style.marginBottom = '10px';
+                    divCard.style.borderRadius = '6px';
 
-            if (orders.length === 0) {
-                if(noOrdersMessage) noOrdersMessage.style.display = 'block';
-                return;
+                    // Ex.: ordem de exemplo: { _id, userId, boxType, planType, createdAt, ... }
+                    const createdAt = new Date(order.createdAt).toLocaleDateString('pt-BR');
+                    divCard.innerHTML = `
+                        <p><strong>ID Pedido:</strong> ${order._id}</p>
+                        <p><strong>Tipo de Box:</strong> ${order.boxType}</p>
+                        <p><strong>Plano:</strong> ${order.planType}</p>
+                        <p><strong>Criado em:</strong> ${createdAt}</p>
+                    `;
+                    ordersListContainer.appendChild(divCard);
+                });
+            } else {
+                noOrdersMessageDiv.style.display = 'block';
             }
-
-            orders.forEach(order => {
-                const orderHtml = `
-                    <div class="order-card">
-                        <h4>Pedido #${order.id || 'N/A'} <span class="order-status">${order.status || 'Processando'}</span></h4>
-                        <p><strong>Data:</strong> ${new Date(order.createdAt || Date.now()).toLocaleDateString('pt-BR')}</p>
-                        <p><strong>Itens:</strong> ${order.itemsDescription || `${order.boxType || ''} - ${order.planType || ''}`}</p>
-                        <p><strong>Total:</strong> R$ ${parseFloat(order.totalAmount || 0).toFixed(2).replace('.', ',')}</p>
-                        ${order.trackingCode ? `<p><strong>Rastreio:</strong> ${order.trackingCode}</p>` : ''}
-                        <button class="btn btn-small btn-secondary" onclick="viewOrderDetails('${order.id}')">Ver Detalhes</button>
-                    </div>
-                `;
-                if(ordersListContainer) ordersListContainer.insertAdjacentHTML('beforeend', orderHtml);
-            });
-        } catch (error) {
-            console.error("Erro ao carregar pedidos:", error);
-            if(ordersListContainer) ordersListContainer.innerHTML = `<p>Ocorreu um erro ao buscar seus pedidos.</p>`;
+        } catch (err) {
+            console.error('Erro ao buscar pedidos:', err);
+            noOrdersMessageDiv.style.display = 'block';
         }
     }
 
-    window.viewOrderDetails = function(orderId) {
-        alert(`Detalhes do pedido ${orderId} - Funcionalidade a ser implementada.`);
+    // ------------------------------
+    // 7) Função para exibir “Endereços”
+    // ------------------------------
+    function displayUserAddress(addressObj) {
+        addressDisplayAreaDiv.innerHTML = '';
+        addressLoadingDiv.style.display = 'none';
+        noAddressMessageDiv.style.display = 'none';
+
+        if (
+            addressObj &&
+            (addressObj.street || addressObj.city || addressObj.zipcode)
+        ) {
+            // monta a exibição do endereço formatado
+            const pStreet = document.createElement('p');
+            pStreet.textContent = `Endereço: ${addressObj.street || '-'}`;
+
+            const pComplement = document.createElement('p');
+            pComplement.textContent = `Complemento: ${addressObj.complement || '-'}`;
+
+            const pNeighborhood = document.createElement('p');
+            pNeighborhood.textContent = `Bairro: ${addressObj.neighborhood || '-'}`;
+
+            const pCity = document.createElement('p');
+            pCity.textContent = `Cidade: ${addressObj.city || '-'} - ${addressObj.state || '-'} (CEP: ${addressObj.zipcode || '-'})`;
+
+            addressDisplayAreaDiv.appendChild(pStreet);
+            addressDisplayAreaDiv.appendChild(pComplement);
+            addressDisplayAreaDiv.appendChild(pNeighborhood);
+            addressDisplayAreaDiv.appendChild(pCity);
+            addressDisplayAreaDiv.style.padding = '15px';
+        } else {
+            // Caso não haja endereço salvo
+            noAddressMessageDiv.style.display = 'block';
+        }
     }
 
+    // ------------------------------
+    // 8) Alterar senha (aba “Segurança”)
+    // ------------------------------
     if (changePasswordFormAccount) {
-        changePasswordFormAccount.addEventListener('submit', async function(e) {
+        changePasswordFormAccount.addEventListener('submit', async function (e) {
             e.preventDefault();
             const currentPassword = document.getElementById('current-password-page').value;
-            const newPassword = document.getElementById('new-password-page').value;
-            const confirmNewPassword = document.getElementById('confirm-new-password-page').value;
-
-            if (newPassword !== confirmNewPassword) {
-                alert("As novas senhas não coincidem."); return;
-            }
-            if (newPassword.length < 6) {
-                alert("A nova senha deve ter no mínimo 6 caracteres."); return;
-            }
+            const newPassword     = document.getElementById('new-password-page').value;
             try {
-                const response = await fetch(`${API_BASE_URL}/auth/change-password`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': token },
+                const response = await fetch(`${API_BASE_URL}/users/me/password`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token
+                    },
                     body: JSON.stringify({ currentPassword, newPassword })
                 });
                 const result = await response.json();
-                if (!response.ok) throw new Error(result.message || "Erro ao alterar senha.");
-                alert(result.message || "Senha alterada com sucesso!");
+                if (!response.ok) throw new Error(result.message || 'Erro ao alterar senha.');
+                alert(result.message || 'Senha alterada com sucesso!');
                 changePasswordFormAccount.reset();
-            } catch (error) {
-                console.error("Erro ao alterar senha:", error);
-                alert(error.message);
+            } catch (err) {
+                console.error('Erro ao alterar senha:', err);
+                alert(err.message);
             }
+        });
+    }
+
+    // ------------------------------
+    // 9) Navegação entre abas (hashchange)
+    // ------------------------------
+    function setActiveTab(sectionId) {
+        // exibe/oculta seções
+        contentSections.forEach(sec => {
+            sec.classList.toggle('active-content', sec.id === sectionId);
+        });
+        // atualiza estilo do link ativo
+        navLinks.forEach(link => {
+            const target = link.getAttribute('data-section');
+            // A classe CSS esperada para link ativo é “active-account-tab” (estilo no CSS)
+            link.classList.toggle('active-account-tab', target === sectionId);
         });
     }
 
     function handleHashChange() {
-        const hash = window.location.hash.substring(1);
+        const hash = window.location.hash.replace('#', '');
         const defaultSection = 'perfil';
         const sectionToLoad = hash || defaultSection;
-        // Verifica se a seção existe antes de tentar ativá-la
-        const sectionExists = Array.from(contentSections).some(section => section.id === sectionToLoad);
-        if (sectionExists) {
+        const exists = Array.from(contentSections).some(sec => sec.id === sectionToLoad);
+        if (exists) {
             setActiveTab(sectionToLoad);
         } else {
-            setActiveTab(defaultSection); // Vai para a default se o hash for inválido
-            if (hash) window.location.hash = defaultSection; // Corrige o hash na URL
+            setActiveTab(defaultSection);
+            window.location.hash = defaultSection;
         }
     }
-
     window.addEventListener('hashchange', handleHashChange);
 
+    // ------------------------------
+    // 10) Carrega tudo
+    // ------------------------------
     fetchUserProfile();
     handleHashChange();
 });
