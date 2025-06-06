@@ -103,28 +103,33 @@ router.post('/create_preference', async (req, res) => {
       auto_return: 'approved',
     };
 
-    if (duracaoPlano !== 'Única') {
-      let frequency;
-      const frequency_type = 'months';
+    // ↓↓↓– LÓGICA ATUALIZADA PARA COBRANÇA RECORRENTE COM NÚMERO FIXO DE CICLOS –↓↓↓
+if (duracaoPlano !== 'Única') {
+  // Para semestral (6 meses) ou anual (12 meses), cobrar 1x por mês durante as repetições
+  let repetitions;       // número total de cobranças mensais
+  const frequency = 1;   // 1 vez a cada 1 mês
+  const frequency_type = 'months';
 
-      if (duracaoPlano === '6 meses') {
-        frequency = 6;
-      } else if (duracaoPlano === '12 meses') {
-        frequency = 12;
-      }
+  if (duracaoPlano === '6 meses') {
+    repetitions = 6;
+  } else if (duracaoPlano === '12 meses') {
+    repetitions = 12;
+  }
 
-      if (frequency) {
-        preferencePayload.auto_recurring = {
-          frequency: frequency,
-          frequency_type: frequency_type,
-          transaction_amount: parseFloat(valor.toFixed(2)),
-          currency_id: 'BRL',
-        };
-      } else {
-        console.error(`Duração do plano não mapeada para recorrência: ${duracaoPlano}`);
-        return res.status(400).json({ error: 'Configuração de duração do plano inválida para assinatura.' });
-      }
-    }
+  if (repetitions) {
+    preferencePayload.auto_recurring = {
+      frequency: frequency,                   // taxa fixa de 1 mês em 1 mês
+      frequency_type: frequency_type,         // meses
+      transaction_amount: parseFloat(valor.toFixed(2)),
+      currency_id: 'BRL',
+      repetitions: repetitions                // quantas vezes a cobrança será executada
+    };
+  } else {
+    console.error(`Duração do plano não mapeada para recorrência: ${duracaoPlano}`);
+    return res.status(400).json({ error: 'Configuração de duração do plano inválida para assinatura.' });
+  }
+}
+// ↑↑↑– FIM DA LÓGICA ATUALIZADA –↑↑↑
 
     console.log('Enviando para Mercado Pago /checkout/preferences:', JSON.stringify(preferencePayload, null, 2));
 
