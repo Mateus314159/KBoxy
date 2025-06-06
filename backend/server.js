@@ -30,6 +30,8 @@ const paymentRoutes = require('./routes/paymentRoutes');
 // 4.2. IMPORTAR A ROTA DE CHECKOUT (purchase)
 const purchaseRoutes = require('./routes/purchaseRoutes');
 
+const subscriptionRoutes = require('./routes/subscriptionRoutes');
+
 // 5. MONTAR ROTAS DE API
 app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
@@ -40,6 +42,9 @@ app.use('/api/payment', paymentRoutes);
 
 // 5.2. MONTAR A ROTA /purchase → envia checkout.html
 app.use('/purchase', purchaseRoutes);
+
+// 5.3. MONTAR A ROTA DE ASSINATURAS
+app.use('/api/subscription', subscriptionRoutes);
 
 // 6. INICIAR O SERVIDOR
 const PORT = process.env.PORT || 5000;
