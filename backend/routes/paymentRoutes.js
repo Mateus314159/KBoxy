@@ -83,7 +83,7 @@ router.post('/create_preference', async (req, res) => {
     ];
 
     // URL base para callbacks usando a sua URL do ngrok
-    const serverUrl = process.env.SERVER_URL || 'https://b759-2804-14d-8083-843d-a1f0-aba1-960b-e303.ngrok-free.app';
+    const serverUrl = process.env.SERVER_URL || 'https://kboxy-teste-site.onrender.com';
 
     // Em produção, você usaria a variável de ambiente:
     // const serverUrl = process.env.SERVER_URL || 'https://b759-2804-14d-8083-843d-a1f0-aba1-960b-e303.ngrok-free.app';
