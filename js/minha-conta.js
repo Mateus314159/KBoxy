@@ -1,7 +1,8 @@
 // js/minha-conta.js
 
 document.addEventListener('DOMContentLoaded', function () {
-    const API_BASE_URL = 'http://localhost:5000/api'; // ajuste se necessário
+    // Agora usamos rota relativa: em produção, fará /api/users/me em vez de localhost:5000
+    const API_BASE_URL = '/api';
     const token = localStorage.getItem('authToken');
 
     // ------------------------------
@@ -12,15 +13,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const userAccountName    = document.getElementById('user-account-name');
     const userAccountEmail   = document.getElementById('user-account-email');
 
-    const profileInputName    = document.getElementById('profile-input-name');
-    const profileInputEmail   = document.getElementById('profile-input-email');
-    const profileInputStreet  = document.getElementById('profile-input-street');
+    const profileInputName       = document.getElementById('profile-input-name');
+    const profileInputEmail      = document.getElementById('profile-input-email');
+    const profileInputStreet     = document.getElementById('profile-input-street');
     const profileInputComplement = document.getElementById('profile-input-complement');
     const profileInputNeighborhood = document.getElementById('profile-input-neighborhood');
-    const profileInputCity    = document.getElementById('profile-input-city');
-    const profileInputState   = document.getElementById('profile-input-state');
-    const profileInputZipcode = document.getElementById('profile-input-zipcode');
-    const profileUpdateForm   = document.getElementById('profile-update-form');
+    const profileInputCity       = document.getElementById('profile-input-city');
+    const profileInputState      = document.getElementById('profile-input-state');
+    const profileInputZipcode    = document.getElementById('profile-input-zipcode');
+    const profileUpdateForm      = document.getElementById('profile-update-form');
 
     // Aba “Sua Assinatura”
     const subscriptionLoadingDiv       = document.getElementById('subscription-info-loading');
@@ -54,13 +55,14 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!response.ok) throw new Error('Não foi possível carregar dados do perfil.');
 
             const userData = await response.json();
+
             // Exibe nome e email no topo
             userAccountName.textContent  = userData.name || '';
             userAccountEmail.textContent = userData.email || '';
             profileInputEmail.value = userData.email || '';
             profileInputName.value  = userData.name || '';
 
-            // Preenche formulário “Meu Perfil”
+            // Preenche formulário “Meu Perfil” com endereço, se existir
             if (userData.address) {
                 profileInputStreet.value       = userData.address.street       || '';
                 profileInputComplement.value   = userData.address.complement   || '';
@@ -72,20 +74,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Carrega foto de avatar (se existir)
             if (userData.avatarUrl) {
-                // A rota do backend expõe as imagens em /uploads/avatars/...
-                userAvatarImg.src = `${API_BASE_URL.replace('/api', '')}${userData.avatarUrl}`;
+                userAvatarImg.src = userData.avatarUrl;
             }
 
-            // EXIBIR o endereço na aba “Endereços”
+            // Exibe o endereço na aba “Endereços”
             displayUserAddress(userData.address);
 
-            // EXIBIR os pedidos na aba “Meus Pedidos”
+            // Exibe pedidos na aba “Meus Pedidos”
             fetchUserOrders();
 
-            // EXIBIR mensagem de “não ativo” na aba “Sua Assinatura”
-            displayUserSubscription(); 
-            // (atualmente sempre mostra “não é assinante”, pois esse backend não possui rota de assinatura)
-
+            // Exibe mensagem de “não ativo” na aba “Sua Assinatura”
+            displayUserSubscription();
+            // (tal como está, sempre mostra “não é assinante”, pois não há rota de assinatura no backend)
         } catch (err) {
             console.error('Erro ao buscar perfil:', err);
         }
@@ -126,7 +126,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 const respData = await response.json();
                 alert('Perfil atualizado com sucesso!');
                 userAccountName.textContent = respData.name || '';
-                // Atualiza visualização em “Endereços” automaticamente
                 displayUserAddress(respData.address);
             } catch (err) {
                 console.error('Erro ao atualizar perfil:', err);
@@ -135,52 +134,50 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-  // 4) Upload de avatar
-// ------------------------------
-if (avatarUploadInput) {
-  avatarUploadInput.addEventListener('change', async function (e) {
-    const file = e.target.files[0];
-    if (!file) return;
+    // ------------------------------
+    // 4) Upload de avatar
+    // ------------------------------
+    if (avatarUploadInput) {
+        avatarUploadInput.addEventListener('change', async function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
 
-    const formData = new FormData();
-    formData.append('avatar', file);
+            const formData = new FormData();
+            formData.append('avatar', file);
 
-    try {
-      const response = await fetch(`${API_BASE_URL}/users/me/avatar`, {
-        method: 'POST',
-        headers: { 'Authorization': token },
-        body: formData
-      });
-      if (!response.ok) {
-        const errJson = await response.json().catch(() => ({}));
-        throw new Error(errJson.message || 'Erro ao enviar foto.');
-      }
-      const data = await response.json();
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/me/avatar`, {
+                    method: 'POST',
+                    headers: { 'Authorization': token },
+                    body: formData
+                });
+                if (!response.ok) {
+                    const errJson = await response.json().catch(() => ({}));
+                    throw new Error(errJson.message || 'Erro ao enviar foto.');
+                }
+                const data = await response.json();
 
-      // Atualiza <img> do avatar nesta página
-      userAvatarImg.src = `${API_BASE_URL.replace('/api', '')}${data.avatarUrl}`;
+                // Atualiza <img> do avatar nesta página
+                userAvatarImg.src = data.avatarUrl;
 
-      // ==== ADICIONE ESSES DOIS TRECHOS ABAIXO ====
-      localStorage.setItem('userAvatarUrl', `${API_BASE_URL.replace('/api', '')}${data.avatarUrl}`);
-      if (window.updateUIAfterLogin) {
-        window.updateUIAfterLogin();
-      }
-      // ===========================================
+                // Atualiza localStorage e canto do header, se houver
+                localStorage.setItem('userAvatarUrl', data.avatarUrl);
+                if (window.updateUIAfterLogin) {
+                    window.updateUIAfterLogin();
+                }
 
-      alert('Foto de perfil atualizada com sucesso!');
-    } catch (err) {
-      console.error('Erro ao enviar foto de perfil:', err);
-      alert(err.message);
+                alert('Foto de perfil atualizada com sucesso!');
+            } catch (err) {
+                console.error('Erro ao enviar foto de perfil:', err);
+                alert(err.message);
+            }
+        });
     }
-  });
-}
 
     // ------------------------------
     // 5) Função para exibir “Sua Assinatura”
-    //    (aqui, exibe sempre “não ativo”)
     // ------------------------------
     function displayUserSubscription() {
-        // como não há rota de subscription no back-end, simulamos sempre sem assinatura
         subscriptionLoadingDiv.style.display = 'none';
         activeSubscriptionDetailsDiv.style.display = 'none';
         noActiveSubscriptionDiv.style.display = 'block';
@@ -188,7 +185,6 @@ if (avatarUploadInput) {
 
     // ------------------------------
     // 6) Função para buscar “Meus Pedidos”
-    //    Rota: GET /api/orders/my
     // ------------------------------
     async function fetchUserOrders() {
         ordersListContainer.innerHTML = '';
@@ -201,7 +197,6 @@ if (avatarUploadInput) {
             const orders = await response.json();
 
             if (Array.isArray(orders) && orders.length > 0) {
-                // Para cada pedido, criamos um card simples
                 orders.forEach(order => {
                     const divCard = document.createElement('div');
                     divCard.classList.add('order-card');
@@ -210,7 +205,6 @@ if (avatarUploadInput) {
                     divCard.style.marginBottom = '10px';
                     divCard.style.borderRadius = '6px';
 
-                    // Ex.: ordem de exemplo: { _id, userId, boxType, planType, createdAt, ... }
                     const createdAt = new Date(order.createdAt).toLocaleDateString('pt-BR');
                     divCard.innerHTML = `
                         <p><strong>ID Pedido:</strong> ${order._id}</p>
@@ -241,7 +235,6 @@ if (avatarUploadInput) {
             addressObj &&
             (addressObj.street || addressObj.city || addressObj.zipcode)
         ) {
-            // monta a exibição do endereço formatado
             const pStreet = document.createElement('p');
             pStreet.textContent = `Endereço: ${addressObj.street || '-'}`;
 
@@ -260,7 +253,6 @@ if (avatarUploadInput) {
             addressDisplayAreaDiv.appendChild(pCity);
             addressDisplayAreaDiv.style.padding = '15px';
         } else {
-            // Caso não haja endereço salvo
             noAddressMessageDiv.style.display = 'block';
         }
     }
@@ -297,14 +289,11 @@ if (avatarUploadInput) {
     // 9) Navegação entre abas (hashchange)
     // ------------------------------
     function setActiveTab(sectionId) {
-        // exibe/oculta seções
         contentSections.forEach(sec => {
             sec.classList.toggle('active-content', sec.id === sectionId);
         });
-        // atualiza estilo do link ativo
         navLinks.forEach(link => {
             const target = link.getAttribute('data-section');
-            // A classe CSS esperada para link ativo é “active-account-tab” (estilo no CSS)
             link.classList.toggle('active-account-tab', target === sectionId);
         });
     }
