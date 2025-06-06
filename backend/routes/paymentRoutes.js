@@ -140,7 +140,7 @@ router.post('/create_preference', async (req, res) => {
     );
 
     console.log('Resposta do Mercado Pago:', response.data);
-    return res.json({ checkoutUrl: response.data.init_point, preferenceId: response.data.id });
+    return res.json({ checkoutUrl: response.data.sandbox_init_point, preferenceId: response.data.id });
 
   } catch (err) {
     if (err.response) {
