@@ -1,5 +1,5 @@
-// Defina a URL base da sua API aqui
-const API_BASE_URL = 'http://localhost:5000/api'; // Ou a URL do seu backend em produção/staging
+// Defina a URL base da sua API aqui (rota relativa funcionará tanto em dev quanto em produção)
+const API_BASE_URL = '/api';
 
 document.addEventListener('DOMContentLoaded', function() {
     const body = document.body;
@@ -35,8 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalBoxDescriptionFull = document.getElementById('modalBoxDescriptionFull');
 
     // --- Seletores para Ações do Usuário (Login/Cadastro Dropdown) ---
-    // const loginActionButton = document.getElementById('login-action-button'); // Será pego dentro das funções que precisam
-    // const userDropdownMenu = document.getElementById('user-dropdown'); // Será pego dentro das funções
+    // Serão manipulados dentro das funções específicas
 
     // --- Seletores para o Modal de Login ---
     const loginModalOverlay = document.getElementById('login-modal-overlay');
@@ -118,25 +117,22 @@ document.addEventListener('DOMContentLoaded', function() {
             displayName: "K-BOXY First Love",
             plans: [
                 { id: "firstLove", name: "Plano Mensal (Compra Única) – R$ 69,90", type: "unique" },
-
                 { id: "fl_semi_annual", name: "Plano Semestral", price: "R$ 54,90/mês", description: "Receba 6 boxes, uma por mês. Cobrança mensal.", type: "subscription_6" },
                 { id: "fl_annual", name: "Plano Anual", price: "R$ 49,90/mês", description: "Receba 12 boxes, uma por mês. Cobrança mensal.", type: "subscription_12" }
             ]
         },
-        idolBox: { // Corresponde a 'K-BOXY Lover'
+        idolBox: {
             displayName: "K-BOXY Lover",
             plans: [
                 { id: "idolBox", name: "Plano Mensal (Compra Única) – R$ 79,90", type: "unique" },
-
                 { id: "il_semi_annual", name: "Plano Semestral", price: "R$ 64,90/mês", description: "Receba 6 boxes, uma por mês. Cobrança mensal.", type: "subscription_6" },
                 { id: "il_annual", name: "Plano Anual", price: "R$ 59,90/mês", description: "Receba 12 boxes, uma por mês. Cobrança mensal.", type: "subscription_12" }
             ]
         },
-        legendBox: { // Corresponde a 'K-BOXY True Love'
+        legendBox: {
             displayName: "K-BOXY True Love",
             plans: [
                 { id: "legendBox", name: "Plano Mensal (Compra Única) – R$ 99,90", type: "unique" },
-
                 { id: "tl_semi_annual", name: "Plano Semestral", price: "R$ 84,90/mês", description: "Receba 6 boxes, uma por mês. Cobrança mensal.", type: "subscription_6" },
                 { id: "tl_annual", name: "Plano Anual", price: "R$ 79,90/mês", description: "Receba 12 boxes, uma por mês. Cobrança mensal.", type: "subscription_12" }
             ]
@@ -147,43 +143,35 @@ document.addEventListener('DOMContentLoaded', function() {
     // FUNÇÕES DE LOGIN, LOGOUT E ATUALIZAÇÃO DA UI
     // =========================================================================
 
-    // Adicione a função window.updateUIAfterLogin para ser acessível globalmente se necessário
+    // Torna esta função global para uso também em outros contextos
     window.updateUIAfterLogin = function() {
         const currentLoginActionButton = document.getElementById('login-action-button');
         const currentUserDropdownMenu = document.getElementById('user-dropdown');
         const token = localStorage.getItem('authToken');
 
         if (token) {
-            // Usuário está LOGADO
-            const userAvatarUrl = localStorage.getItem('userAvatarUrl'); // <<< NOVO: Pega a URL do avatar
-
+            // Usuário está logado
+            const userAvatarUrl = localStorage.getItem('userAvatarUrl');
             if (currentLoginActionButton) {
-                // <<< NOVO: Verifica se existe uma URL de avatar válida
                 if (userAvatarUrl && userAvatarUrl !== "null" && userAvatarUrl !== "undefined" && userAvatarUrl.trim() !== "") {
-                    // Se existir, mostra a imagem do avatar no botão do header
                     currentLoginActionButton.innerHTML = `<img src="${userAvatarUrl}" alt="Avatar" class="header-user-avatar">`;
                 } else {
-                    // Se não existir, mostra o ícone de usuário logado padrão
                     currentLoginActionButton.innerHTML = '<i class="fas fa-user-check"></i>';
                 }
             }
-
             if (currentUserDropdownMenu) {
                 currentUserDropdownMenu.innerHTML = `
                     <a href="minha-conta.html#pedidos" class="user-dropdown-link">Seus Pedidos</a>
                     <a href="minha-conta.html#perfil" class="user-dropdown-link">Conta</a>
                     <a href="#" id="dropdown-logout-link" class="user-dropdown-link">Sair</a>
                 `;
-
                 const logoutLink = document.getElementById('dropdown-logout-link');
                 if (logoutLink) {
-                    logoutLink.addEventListener('click', function(e) { // Adiciona event listener aqui
+                    logoutLink.addEventListener('click', function(e) {
                         e.preventDefault();
                         handleLogout();
                     });
                 }
-
-                // Para os outros links, apenas fechar o dropdown ao clicar, pois a navegação é via href
                 const dropdownLinks = currentUserDropdownMenu.querySelectorAll('a.user-dropdown-link');
                 dropdownLinks.forEach(link => {
                     if (link.id !== 'dropdown-logout-link') {
@@ -196,7 +184,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         } else {
-            // Usuário NÃO está LOGADO
+            // Usuário NÃO está logado
             if (currentLoginActionButton) {
                 currentLoginActionButton.innerHTML = '<i class="fas fa-user-circle"></i>';
             }
@@ -223,24 +211,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         }
-    }
+    };
 
-    // Adicione a função window.handleLogout para ser acessível globalmente se necessário
-    window.handleLogout = function(event) { // Modificado para ser acessível globalmente se precisar
-        if(event) event.preventDefault();
+    // Torna logout global também
+    window.handleLogout = function(event) {
+        if (event) event.preventDefault();
         localStorage.removeItem('authToken');
         localStorage.removeItem('userId');
-        localStorage.removeItem('userAvatarUrl'); // <<< NOVO: Limpar a URL do avatar ao sair
+        localStorage.removeItem('userAvatarUrl');
         alert('Você foi desconectado.');
-        updateUIAfterLogin(); // Atualiza a UI para o estado de não logado
+        updateUIAfterLogin();
         const currentUserDropdownMenu = document.getElementById('user-dropdown');
         if (currentUserDropdownMenu) currentUserDropdownMenu.classList.remove('active');
 
-        // Se o usuário estiver na página minha-conta.html, redirecionar para a home
         if (window.location.pathname.includes('minha-conta.html')) {
             window.location.href = 'index.html';
         }
-    }
+    };
 
     // =========================================================================
     // LÓGICA DOS MODAIS
@@ -251,13 +238,19 @@ document.addEventListener('DOMContentLoaded', function() {
         if (subscriptionPlansModal && subscriptionPlansModal.classList.contains('active')) closeSubscriptionPlansModal();
         if (loginModalOverlay) {
             loginModalOverlay.style.display = 'flex';
-            setTimeout(() => { loginModalOverlay.classList.add('active'); body.classList.add('no-scroll-modal'); }, 10);
+            setTimeout(() => {
+                loginModalOverlay.classList.add('active');
+                body.classList.add('no-scroll-modal');
+            }, 10);
         }
     }
     function closeLoginModal() {
         if (loginModalOverlay) {
-            loginModalOverlay.classList.remove('active'); body.classList.remove('no-scroll-modal');
-            setTimeout(() => { if (!loginModalOverlay.classList.contains('active')) loginModalOverlay.style.display = 'none'; }, 300);
+            loginModalOverlay.classList.remove('active');
+            body.classList.remove('no-scroll-modal');
+            setTimeout(() => {
+                if (!loginModalOverlay.classList.contains('active')) loginModalOverlay.style.display = 'none';
+            }, 300);
         }
     }
 
@@ -266,22 +259,28 @@ document.addEventListener('DOMContentLoaded', function() {
         if (subscriptionPlansModal && subscriptionPlansModal.classList.contains('active')) closeSubscriptionPlansModal();
         if (registerModalOverlay) {
             registerModalOverlay.style.display = 'flex';
-            setTimeout(() => { registerModalOverlay.classList.add('active'); body.classList.add('no-scroll-modal'); }, 10);
+            setTimeout(() => {
+                registerModalOverlay.classList.add('active');
+                body.classList.add('no-scroll-modal');
+            }, 10);
         }
     }
     function closeRegisterModal() {
         if (registerModalOverlay) {
-            registerModalOverlay.classList.remove('active'); body.classList.remove('no-scroll-modal');
-            setTimeout(() => { if (!registerModalOverlay.classList.contains('active')) registerModalOverlay.style.display = 'none'; }, 300);
+            registerModalOverlay.classList.remove('active');
+            body.classList.remove('no-scroll-modal');
+            setTimeout(() => {
+                if (!registerModalOverlay.classList.contains('active')) registerModalOverlay.style.display = 'none';
+            }, 300);
         }
     }
 
     function openBoxModal(boxId) {
         const details = boxDetailsData[boxId];
         if (details && boxDetailsModal) {
-            if(modalBoxImage) modalBoxImage.src = details.image || 'https://via.placeholder.com/400x300/ccc/000?text=Imagem+Indisponível';
-            if(modalBoxName) modalBoxName.textContent = details.name;
-            if(modalBoxPrice) modalBoxPrice.textContent = details.price;
+            if (modalBoxImage) modalBoxImage.src = details.image || 'https://via.placeholder.com/400x300/ccc/000?text=Imagem+Indisponível';
+            if (modalBoxName) modalBoxName.textContent = details.name;
+            if (modalBoxPrice) modalBoxPrice.textContent = details.price;
 
             if (modalBoxDescriptionFull) {
                 let descriptionHtml = `<p>${details.description}</p>`;
@@ -323,8 +322,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 const planElement = document.createElement('div');
                 planElement.classList.add('plan-item');
                 planElement.dataset.planId = plan.id;
-                planElement.dataset.planType = plan.type; // Ex: "unique", "subscription_6"
-                planElement.dataset.boxType = boxId; // Ex: "firstLove"
+                planElement.dataset.planType = plan.type;
+                planElement.dataset.boxType = boxId;
 
                 let planPriceInfo = `<p class="plan-price">${plan.price}</p>`;
 
@@ -338,7 +337,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 planElement.querySelector('.btn-select-plan').addEventListener('click', function() {
                     const selectedBoxType = this.closest('.plan-item').dataset.boxType;
                     const selectedPlanId = this.closest('.plan-item').dataset.planId;
-                    createOrder(selectedBoxType, selectedPlanId); // Agora redireciona para /purchase?plan=
+                    createOrder(selectedBoxType, selectedPlanId);
                     closeSubscriptionPlansModal();
                 });
                 subscriptionPlansListElem.appendChild(planElement);
@@ -374,7 +373,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const password = loginPasswordInput ? loginPasswordInput.value.trim() : '';
 
             if (!email || !password) {
-                alert('Por favor, preencha email e senha.'); return;
+                alert('Por favor, preencha email e senha.');
+                return;
             }
 
             fetch(`${API_BASE_URL}/auth/login`, {
@@ -387,13 +387,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (status === 200 && body.token) {
                     localStorage.setItem('authToken', body.token);
                     localStorage.setItem('userId', body.userId);
-                    // <<< NOVO: Se o backend retornar a avatarUrl no login, salve-a também
                     if (body.avatarUrl) {
                         localStorage.setItem('userAvatarUrl', body.avatarUrl);
                     }
                     alert('Login realizado com sucesso!');
                     closeLoginModal();
-                    updateUIAfterLogin(); // Atualiza a UI (incluindo o avatar no header)
+                    updateUIAfterLogin();
                 } else {
                     alert(body.message || 'Erro ao fazer login. Verifique suas credenciais.');
                 }
@@ -424,19 +423,22 @@ document.addEventListener('DOMContentLoaded', function() {
             const confirmPassword = registerConfirmPasswordInput ? registerConfirmPasswordInput.value.trim() : '';
 
             if (!email || !password || !confirmPassword) {
-                alert('Por favor, preencha todos os campos.'); return;
+                alert('Por favor, preencha todos os campos.');
+                return;
             }
             if (password.length < 6) {
-                alert('A senha deve ter no mínimo 6 caracteres.'); return;
+                alert('A senha deve ter no mínimo 6 caracteres.');
+                return;
             }
             if (password !== confirmPassword) {
-                alert('As senhas não coincidem!'); return;
+                alert('As senhas não coincidem!');
+                return;
             }
 
             fetch(`${API_BASE_URL}/auth/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: email, password: password }), // O backend pode precisar de 'name' também
+                body: JSON.stringify({ email: email, password: password }),
             })
             .then(response => response.json().then(data => ({ status: response.status, body: data })))
             .then(({ status, body }) => {
@@ -489,7 +491,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Modificamos aqui: ao invés de criar o pedido via fetch, redirecionamos para /purchase
     function createOrder(boxType, planIdForBackend) {
         const token = localStorage.getItem('authToken');
         if (!token) {
@@ -497,11 +498,9 @@ document.addEventListener('DOMContentLoaded', function() {
             openLoginModal();
             return;
         }
-        // Redireciona para a rota de checkout, passando o ID do plano
         window.location.href = `/purchase?plan=${planIdForBackend}`;
     }
 
-    // Agora, o botão “Assinar” em cada card abre o modal de planos
     const subscribeButtons = document.querySelectorAll('.box-card .btn-ver-mais');
     if (subscribeButtons) {
         subscribeButtons.forEach(button => {
@@ -636,12 +635,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     scrollToSection(href);
                     if (navMenu && navMenu.classList.contains('active')) {
                         navMenu.classList.remove('active');
-                        if(menuToggle) menuToggle.classList.remove('active');
+                        if (menuToggle) menuToggle.classList.remove('active');
                         body.classList.remove('no-scroll');
                         const openIcon = menuToggle ? menuToggle.querySelector('.fa-bars') : null;
                         const closeIconElement = menuToggle ? menuToggle.querySelector('.fa-times') : null;
-                        if(openIcon) openIcon.style.display = 'block';
-                        if(closeIconElement) closeIconElement.style.display = 'none';
+                        if (openIcon) openIcon.style.display = 'block';
+                        if (closeIconElement) closeIconElement.style.display = 'none';
                     }
                 }
             }
@@ -683,7 +682,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (initialLoginActionButton) {
         initialLoginActionButton.addEventListener('click', function(event) {
             event.stopPropagation();
-            const currentDropdownMenu = document.getElementById('user-dropdown'); // Pega o dropdown atual
+            const currentDropdownMenu = document.getElementById('user-dropdown');
             if (currentDropdownMenu) currentDropdownMenu.classList.toggle('active');
 
             if (loginModalOverlay && loginModalOverlay.classList.contains('active')) closeLoginModal();
@@ -693,7 +692,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     document.addEventListener('click', function(event) {
         const currentDropdownMenu = document.getElementById('user-dropdown');
-        const currentLoginActionButton = document.getElementById('login-action-button'); // Re-seleciona
+        const currentLoginActionButton = document.getElementById('login-action-button');
         if (
             currentDropdownMenu && currentDropdownMenu.classList.contains('active') &&
             !currentDropdownMenu.contains(event.target) &&
