@@ -174,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // -----------------------------------------------------------
-    // 5) Função para exibir “Sua Assinatura” (busca no back-end)
+    // 5) Função para exibir “Sua Assinatura” (busca no back-end) - VERSÃO OTIMIZADA
     // -----------------------------------------------------------
     async function displayUserSubscription() {
         // 5.1) Mostrar o “Carregando…” e esconder ambos os blocos
@@ -192,25 +192,18 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             const subsData = await response.json();
-            // Esconde o loading
             subscriptionLoadingDiv.style.display = 'none';
 
-            // Se não há assinatura ativa (planType é null ou undefined)
             if (!subsData || !subsData.planType) {
                 noActiveSubscriptionDiv.style.display = 'block';
                 return;
             }
 
-            // Caso haja assinatura ativa, extraímos dados
             const { planType, boxType, startDate, nextPaymentDate, repetitionsLeft } = subsData;
 
-            // Formata datas para DD/MM/AAAA
-            const dtStart = new Date(startDate);
-            const dtNext  = new Date(nextPaymentDate);
-            const formattedStart = dtStart.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            const formattedNext  = dtNext.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const formattedStart = new Date(startDate).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const formattedNext  = new Date(nextPaymentDate).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-            // Mapas para texto amigável
             const planTextMap = {
                 'one_time': 'Compra Única',
                 'mensal': 'Plano Mensal',
@@ -226,8 +219,12 @@ document.addEventListener('DOMContentLoaded', function () {
             const planText = planTextMap[planType] || planType;
             const boxText  = boxTextMap[boxType]   || boxType;
 
-            // Monta o HTML do card de assinatura
-            activeSubscriptionDetailsDiv.innerHTML = `
+            // ***** INÍCIO DA MUDANÇA PRINCIPAL *****
+            // Em vez de criar HTML, preenchemos os elementos que já existem no minha-conta.html
+            // Isso é mais limpo e separa a estrutura (HTML) da lógica (JS)
+
+            // Geramos o conteúdo do card dinamicamente e o inserimos
+             activeSubscriptionDetailsDiv.innerHTML = `
                 <div class="subscription-card">
                     <p><strong>Box:</strong> ${boxText}</p>
                     <p><strong>Plano:</strong> ${planText}</p>
@@ -237,9 +234,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     <button id="cancel-subscription-btn" class="btn btn-secondary btn-small">Cancelar Assinatura</button>
                 </div>
             `;
-            activeSubscriptionDetailsDiv.style.display = 'block';
 
-            // Botão de cancelar assinatura
+            // Exibe o container do card
+            activeSubscriptionDetailsDiv.style.display = 'block';
+            
+            // ***** FIM DA MUDANÇA PRINCIPAL *****
+
             const cancelBtn = document.getElementById('cancel-subscription-btn');
             if (cancelBtn) {
                 cancelBtn.addEventListener('click', async () => {
@@ -251,7 +251,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         });
                         if (!cancelResp.ok) throw new Error('Falha ao cancelar assinatura.');
                         alert('Assinatura cancelada com sucesso.');
-                        // Recarrega a seção
                         displayUserSubscription();
                     } catch (err) {
                         console.error('Erro ao cancelar assinatura:', err);
