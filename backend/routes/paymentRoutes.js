@@ -184,47 +184,47 @@ router.get('/success', async (req, res) => {
       const order = await Order.findOne({ paymentId: prefId });
       
       
-+   if (order && order.isSubscription) {
-+     // 3) Se for uma assinatura recorrente, calcular dados necessários
-+     const hoje = new Date();
-+     const dataProxima = new Date(hoje);
-+     dataProxima.setMonth(dataProxima.getMonth() + 1);
-+
-+     // 3.2) Quantas repetições ainda faltam
-+     const duracao = parseInt(order.planType, 10);
-+     const repsLeft = duracao > 1 ? (duracao - 1) : 0;
-+
-+     // 4) Procurar subscription ativa do usuário
-+     let subs = await Subscription.findOne({ userId: order.userId, status: 'active' });
-+     if (!subs) {
-+       // 4.1) Criar nova assinatura
-+       subs = new Subscription({
-+         userId:          order.userId,
-+         boxType:         order.boxType,
-+         planType:        order.planType === '1'   ? 'one_time'
-+                         : order.planType === '6'   ? 'semiannual'
-+                         : order.planType === '12'  ? 'annual'
-+                         : order.planType,
-+         startDate:       new Date(),
-+         nextPaymentDate: dataProxima,
-+         repetitionsLeft: repsLeft,
-+         status:          'active'
-+       });
-+     } else {
-+       // 4.2) Atualizar assinatura existente
-+       subs.boxType         = order.boxType;
-+       subs.planType        = order.planType === '1'   ? 'one_time'
-+                             : order.planType === '6'   ? 'semiannual'
-+                             : order.planType === '12'  ? 'annual'
-+                             : order.planType;
-+       subs.startDate       = new Date();
-+       subs.nextPaymentDate = dataProxima;
-+       subs.repetitionsLeft = repsLeft;
-+       subs.status          = 'active';
-+     }
-+     // 4.3) Salvar no banco
-+     await subs.save();
-+   }
+  if (order && order.isSubscription) {
+    // 3) Se for uma assinatura recorrente, calcular dados necessários
+    const hoje = new Date();
+    const dataProxima = new Date(hoje);
+     dataProxima.setMonth(dataProxima.getMonth() + 1);
+
+     // 3.2) Quantas repetições ainda faltam
+     const duracao = parseInt(order.planType, 10);
+     const repsLeft = duracao > 1 ? (duracao - 1) : 0;
+
+     // 4) Procurar subscription ativa do usuário
+     let subs = await Subscription.findOne({ userId: order.userId, status: 'active' });
+     if (!subs) {
+       // 4.1) Criar nova assinatura
+       subs = new Subscription({
+         userId:          order.userId,
+         boxType:         order.boxType,
+         planType:        order.planType === '1'   ? 'one_time'
+                         : order.planType === '6'   ? 'semiannual'
+                         : order.planType === '12'  ? 'annual'
+                         : order.planType,
+         startDate:       new Date(),
+         nextPaymentDate: dataProxima,
+         repetitionsLeft: repsLeft,
+         status:          'active'
+       });
+     } else {
+       // 4.2) Atualizar assinatura existente
+       subs.boxType         = order.boxType;
+       subs.planType        = order.planType === '1'   ? 'one_time'
+                             : order.planType === '6'   ? 'semiannual'
+                             : order.planType === '12'  ? 'annual'
+                             : order.planType;
+       subs.startDate       = new Date();
+       subs.nextPaymentDate = dataProxima;
+       subs.repetitionsLeft = repsLeft;
+       subs.status          = 'active';
+     }
+     // 4.3) Salvar no banco
+     await subs.save();
+   }
 
   // 5) Enviar a página de sucesso para o cliente
   return res.sendFile(path.join(__dirname, '..', '..', 'payment', 'success.html'));
