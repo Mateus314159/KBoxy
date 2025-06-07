@@ -172,59 +172,57 @@ if (duracaoPlano !== 'Única') {
 // -----------------------------------------------------------
 router.get('/success', async (req, res) => {
   console.log('Callback Success - Query:', req.query);
-
   try {
-    // 1) Obter o preference_id ou payment_id que veio nos parâmetros
-    const prefId = req.query.preference_id || req.query.payment_id;
-    if (!prefId) {
-      console.warn('Nenhum preference_id encontrado nos parâmetros.');
-    } else {
-      // 2) Procurar no banco o Order que foi criado antes do checkout e armazenou esse paymentId
-      //    (supondo que, ao criar a ordem, você tenha salvo paymentId = prefId e userId)
-      const order = await Order.findOne({ paymentId: prefId });
-      
-      
-  if (order && order.isSubscription) {
-    // 3) Se for uma assinatura recorrente, calcular dados necessários
-    const hoje = new Date();
-    const dataProxima = new Date(hoje);
-     dataProxima.setMonth(dataProxima.getMonth() + 1);
+    // 1) Buscar pedido a partir do paymentId
+    const prefId = req.query.preference_id || req.query.preferenceId;
+    const order = await Order.findOne({ paymentId: prefId });
 
-     // 3.2) Quantas repetições ainda faltam
-     const duracao = parseInt(order.planType, 10);
-     const repsLeft = duracao > 1 ? (duracao - 1) : 0;
+    // 2) Se for assinatura, criar ou atualizar Subscription
+    if (order && order.isSubscription) {
+      const hoje = new Date();
+      const duracao = parseInt(order.planType, 10); // ex: 6 para 6 meses
+      const dataProxima = new Date(hoje);
+      dataProxima.setMonth(dataProxima.getMonth() + duracao);
+      const repsLeft = duracao > 1 ? (duracao - 1) : 0;
 
-     // 4) Procurar subscription ativa do usuário
-     let subs = await Subscription.findOne({ userId: order.userId, status: 'active' });
-     if (!subs) {
-       // 4.1) Criar nova assinatura
-       subs = new Subscription({
-         userId:          order.userId,
-         boxType:         order.boxType,
-         planType:        order.planType === '1'   ? 'one_time'
-                         : order.planType === '6'   ? 'semiannual'
-                         : order.planType === '12'  ? 'annual'
-                         : order.planType,
-         startDate:       new Date(),
-         nextPaymentDate: dataProxima,
-         repetitionsLeft: repsLeft,
-         status:          'active'
-       });
-     } else {
-       // 4.2) Atualizar assinatura existente
-       subs.boxType         = order.boxType;
-       subs.planType        = order.planType === '1'   ? 'one_time'
-                             : order.planType === '6'   ? 'semiannual'
-                             : order.planType === '12'  ? 'annual'
-                             : order.planType;
-       subs.startDate       = new Date();
-       subs.nextPaymentDate = dataProxima;
-       subs.repetitionsLeft = repsLeft;
-       subs.status          = 'active';
-     }
-     // 4.3) Salvar no banco
-     await subs.save();
-   }
+      let subs = await Subscription.findOne({ userId: order.userId, status: 'active' });
+      if (!subs) {
+        subs = new Subscription({
+          userId:          order.userId,
+          boxType:         order.boxType,
+          planType:        order.planType === '1'   ? 'one_time'
+                           : order.planType === '6'   ? 'semiannual'
+                           : order.planType === '12'  ? 'annual'
+                           : order.planType,
+          startDate:       hoje,
+          nextPaymentDate: dataProxima,
+          repetitionsLeft: repsLeft,
+          status:          'active'
+        });
+      } else {
+        subs.boxType         = order.boxType;
+        subs.planType        = order.planType === '1'   ? 'one_time'
+                               : order.planType === '6'   ? 'semiannual'
+                               : order.planType === '12'  ? 'annual'
+                               : order.planType;
+        subs.startDate       = hoje;
+        subs.nextPaymentDate = dataProxima;
+        subs.repetitionsLeft = repsLeft;
+        subs.status          = 'active';
+      }
+      await subs.save();
+    }
+
+    // 3) Enviar a página de sucesso
+    return res.sendFile(
+      path.join(__dirname, '..', '..', 'payment', 'success.html')
+    );
+  } catch (err) {
+    console.error('Erro no callback de sucesso:', err);
+    return res.status(500).send('Erro interno');
+  }
+});
+
 
   // 5) Enviar a página de sucesso para o cliente
   return res.sendFile(path.join(__dirname, '..', '..', 'payment', 'success.html'));
