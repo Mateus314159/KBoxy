@@ -1585,20 +1585,7 @@ main {
     /* Por exemplo, se a cor padrão não contrastar bem com o novo modal. */
 }
 
-/* ===== Distribuição simétrica no header (desktop) ===== */
-@media (min-width: 769px) {
-  /* Faz o nav-menu crescer e centraliza os links */
-  .header .container .nav-menu {
-    flex: 1;
-    display: flex;            /* garante que o nav-menu use flex */
-    justify-content: center;  /* centraliza a lista de links */
-  }
-  /* Garante que logo e ações não cresçam */
-  .header .container .logo,
-  .header .container .header-actions {
-    flex: 0;
-  }
-}
+
 
 /* Responsividade para o modal de planos */
 @media (max-width: 768px) {
