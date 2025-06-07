@@ -3,6 +3,8 @@
 const axios = require('axios');
 const Order = require('../models/Order');
 
+console.log('--- O ARQUIVO orderController.js FOI CARREGADO PELO SERVIDOR ---');
+
 // Mapeamento de planos (sem alterações)
 const PLANOS = {
   firstLove: { nome: 'K-BOXY First Love (Compra Única)', valor: 69.90, duracao: 'Única' },
