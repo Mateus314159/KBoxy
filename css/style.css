@@ -1324,7 +1324,7 @@ main {
     }
 
     .header .container { padding: 0 15px; }
-    .logo img { height: 114px; }
+    .logo img { height: 45px; }
 
     .nav-menu {
         position: fixed;
@@ -1585,6 +1585,19 @@ main {
     /* Por exemplo, se a cor padrão não contrastar bem com o novo modal. */
 }
 
+/* ===== Ajuste só no mobile: logo mais à esquerda ===== */
+@media (max-width: 768px) {
+  /* reduz o padding do container para aproximar tudo da borda */
+  .header .container {
+    padding-left: 0.5rem;  /* diminua até ficar no ponto */
+    padding-right: 0.1rem; /* mantém simetria */
+  }
+
+  /* remove qualquer margin extra da logo */
+  .header .container .logo {
+    margin-left: 0;
+  }
+}
 
 
 /* Responsividade para o modal de planos */
