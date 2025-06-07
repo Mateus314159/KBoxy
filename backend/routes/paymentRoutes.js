@@ -85,12 +85,7 @@ router.post('/create_preference', async (req, res) => {
       },
     ];
 
-    // URL base para callbacks usando a sua URL do ngrok
     const serverUrl = process.env.SERVER_URL || 'https://kboxy-teste-site.onrender.com';
-
-    // Em produção, você usaria a variável de ambiente:
-    // const serverUrl = process.env.SERVER_URL || 'https://b759-2804-14d-8083-843d-a1f0-aba1-960b-e303.ngrok-free.app';
-
 
     const urlSucesso  = `${serverUrl}/api/payment/success`;
     const urlFalha    = `${serverUrl}/api/payment/failure`;
@@ -106,33 +101,30 @@ router.post('/create_preference', async (req, res) => {
       auto_return: 'approved',
     };
 
-    // ↓↓↓– LÓGICA ATUALIZADA PARA COBRANÇA RECORRENTE COM NÚMERO FIXO DE CICLOS –↓↓↓
-if (duracaoPlano !== 'Única') {
-  // Para semestral (6 meses) ou anual (12 meses), cobrar 1x por mês durante as repetições
-  let repetitions;       // número total de cobranças mensais
-  const frequency = 1;   // 1 vez a cada 1 mês
-  const frequency_type = 'months';
+    if (duracaoPlano !== 'Única') {
+      let repetitions;
+      const frequency = 1;
+      const frequency_type = 'months';
 
-  if (duracaoPlano === '6 meses') {
-    repetitions = 6;
-  } else if (duracaoPlano === '12 meses') {
-    repetitions = 12;
-  }
+      if (duracaoPlano === '6 meses') {
+        repetitions = 6;
+      } else if (duracaoPlano === '12 meses') {
+        repetitions = 12;
+      }
 
-  if (repetitions) {
-    preferencePayload.auto_recurring = {
-      frequency: frequency,                   // taxa fixa de 1 mês em 1 mês
-      frequency_type: frequency_type,         // meses
-      transaction_amount: parseFloat(valor.toFixed(2)),
-      currency_id: 'BRL',
-      repetitions: repetitions                // quantas vezes a cobrança será executada
-    };
-  } else {
-    console.error(`Duração do plano não mapeada para recorrência: ${duracaoPlano}`);
-    return res.status(400).json({ error: 'Configuração de duração do plano inválida para assinatura.' });
-  }
-}
-// ↑↑↑– FIM DA LÓGICA ATUALIZADA –↑↑↑
+      if (repetitions) {
+        preferencePayload.auto_recurring = {
+          frequency: frequency,
+          frequency_type: frequency_type,
+          transaction_amount: parseFloat(valor.toFixed(2)),
+          currency_id: 'BRL',
+          repetitions: repetitions
+        };
+      } else {
+        console.error(`Duração do plano não mapeada para recorrência: ${duracaoPlano}`);
+        return res.status(400).json({ error: 'Configuração de duração do plano inválida para assinatura.' });
+      }
+    }
 
     console.log('Enviando para Mercado Pago /checkout/preferences:', JSON.stringify(preferencePayload, null, 2));
 
@@ -173,14 +165,12 @@ if (duracaoPlano !== 'Única') {
 router.get('/success', async (req, res) => {
   console.log('Callback Success - Query:', req.query);
   try {
-    // 1) Buscar pedido a partir do paymentId
     const prefId = req.query.preference_id || req.query.preferenceId;
     const order = await Order.findOne({ paymentId: prefId });
 
-    // 2) Se for assinatura, criar ou atualizar Subscription
     if (order && order.isSubscription) {
       const hoje = new Date();
-      const duracao = parseInt(order.planType, 10); // ex: 6 para 6 meses
+      const duracao = parseInt(order.planType, 10);
       const dataProxima = new Date(hoje);
       dataProxima.setMonth(dataProxima.getMonth() + duracao);
       const repsLeft = duracao > 1 ? (duracao - 1) : 0;
@@ -213,7 +203,6 @@ router.get('/success', async (req, res) => {
       await subs.save();
     }
 
-    // 3) Enviar a página de sucesso
     return res.sendFile(
       path.join(__dirname, '..', '..', 'payment', 'success.html')
     );
@@ -223,15 +212,11 @@ router.get('/success', async (req, res) => {
   }
 });
 
-
-  // 5) Enviar a página de sucesso para o cliente
-  return res.sendFile(path.join(__dirname, '..', '..', 'payment', 'success.html'));
-});
-
 router.get('/failure', (req, res) => {
   console.log('Callback Failure - Query:', req.query);
   return res.sendFile(path.join(__dirname, '..', '..', 'payment', 'failure.html'));
 });
+
 router.get('/pending', (req, res) => {
   console.log('Callback Pending - Query:', req.query);
   return res.sendFile(path.join(__dirname, '..', '..', 'payment', 'pending.html'));
