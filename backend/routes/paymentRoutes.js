@@ -10,7 +10,10 @@ const router = express.Router();
 const Order         = require('../models/Order');
 const Subscription  = require('../models/Subscription');
 
-// Mapeamento de planos (sem alterações aqui)
+// Função auxiliar para criar uma pausa (delay)
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Mapeamento de planos (sem alterações)
 const PLANOS = {
   firstLove: { nome: 'K-BOXY First Love (Compra Única)', valor: 69.90, duracao: 'Única' },
   fl_semi_annual: { nome: 'K-BOXY First Love (Assinatura Semestral)', valor: 54.90, duracao: '6 meses' },
@@ -24,13 +27,11 @@ const PLANOS = {
 };
 
 
-// Rota para criar preferência de pagamento (sem alterações aqui)
+// Rota para criar preferência de pagamento (sem alterações)
 router.post('/create_preference', async (req, res) => {
   try {
     const { planId } = req.body;
-    if (!planId || !PLANOS[planId]) {
-      return res.status(400).json({ error: 'Plano inválido.' });
-    }
+    if (!planId || !PLANOS[planId]) return res.status(400).json({ error: 'Plano inválido.' });
     const planoSelecionado = PLANOS[planId];
     const { nome, valor, duracao: duracaoPlano } = planoSelecionado;
     const itens = [{ title: nome, unit_price: parseFloat(valor.toFixed(2)), quantity: 1, currency_id: 'BRL' }];
@@ -73,86 +74,74 @@ router.post('/create_preference', async (req, res) => {
 
 
 // ===================================================================
-// INÍCIO DA SEÇÃO CORRIGIDA
+// INÍCIO DA SEÇÃO FINAL E CORRIGIDA
 // ===================================================================
 router.get('/success', async (req, res) => {
   console.log('[SUCCESS] Callback /success acionado. Query:', req.query);
   try {
     const prefId = req.query.preference_id;
-
-    // 1. Validação Crítica: Verifica se o preference_id existe
     if (!prefId) {
-      console.error('[SUCCESS-ERROR] Nenhuma preference_id foi encontrada na query de retorno do Mercado Pago.');
-      // É importante enviar uma resposta de erro, mas para o usuário, a página de sucesso ainda pode ser mostrada.
-      // A falha será registrada no log para análise do desenvolvedor.
+      console.error('[SUCCESS-ERROR] Nenhuma preference_id encontrada na query.');
       return res.sendFile(path.join(__dirname, '..', '..', 'payment', 'success.html'));
     }
 
-    console.log(`[SUCCESS] Buscando pedido no banco de dados com paymentId (preference_id): ${prefId}`);
-    const order = await Order.findOne({ paymentId: prefId });
+    console.log(`[SUCCESS] Buscando pedido com paymentId (preference_id): ${prefId}`);
+    let order = await Order.findOne({ paymentId: prefId });
 
-    // 2. Validação Crítica: Verifica se o pedido foi encontrado no seu banco de dados
+    // *** LÓGICA DE NOVA TENTATIVA ***
+    // Se o pedido não for encontrado na primeira tentativa, espere 2 segundos e tente de novo.
     if (!order) {
-      console.error(`[SUCCESS-ERROR] Pedido com paymentId ${prefId} NÃO FOI ENCONTRADO no banco de dados. A assinatura não pode ser criada.`);
+      console.warn(`[SUCCESS-WARN] Pedido com paymentId ${prefId} não encontrado. Tentando novamente em 2 segundos...`);
+      await delay(2000); // Pausa de 2 segundos
+      order = await Order.findOne({ paymentId: prefId });
+    }
+
+    // Agora, verificamos novamente. Se ainda for nulo, registramos um erro final.
+    if (!order) {
+      console.error(`[SUCCESS-ERROR-FINAL] Pedido com paymentId ${prefId} NÃO FOI ENCONTRADO mesmo após a espera. A assinatura não pode ser criada.`);
       return res.sendFile(path.join(__dirname, '..', '..', 'payment', 'success.html'));
     }
 
     console.log(`[SUCCESS] Pedido encontrado para o usuário: ${order.userId}. Verificando se é uma assinatura...`);
 
-    // 3. Lógica de criação/atualização da Assinatura (agora com mais logs)
     if (order.isSubscription) {
       console.log('[SUCCESS] O pedido é uma assinatura. Processando...');
       const hoje = new Date();
       const duracao = parseInt(order.planType, 10);
       const dataProxima = new Date(hoje);
-      dataProxima.setMonth(dataProxima.getMonth() + 1); // Próxima cobrança é sempre no mês seguinte
+      dataProxima.setMonth(dataProxima.getMonth() + 1);
       const repsLeft = duracao > 1 ? (duracao - 1) : 0;
-
-      const planTypeString = order.planType === '1'   ? 'one_time'
-                             : order.planType === '6'   ? 'semiannual'
-                             : order.planType === '12'  ? 'annual'
-                             : 'unknown';
+      const planTypeString = order.planType === '1' ? 'one_time' : order.planType === '6' ? 'semiannual' : order.planType === '12' ? 'annual' : 'unknown';
 
       let subs = await Subscription.findOne({ userId: order.userId });
 
       if (!subs) {
-        console.log(`[SUCCESS] Nenhuma assinatura existente para o usuário ${order.userId}. Criando uma nova...`);
-        subs = new Subscription({
-          userId:          order.userId,
-          boxType:         order.boxType,
-          planType:        planTypeString,
-          startDate:       hoje,
-          nextPaymentDate: dataProxima,
-          repetitionsLeft: repsLeft,
-          status:          'active'
-        });
+        console.log(`[SUCCESS] Criando nova assinatura para o usuário ${order.userId}...`);
+        subs = new Subscription({ userId: order.userId, boxType: order.boxType, planType: planTypeString, startDate: hoje, nextPaymentDate: dataProxima, repetitionsLeft: repsLeft, status: 'active' });
       } else {
-        console.log(`[SUCCESS] Assinatura existente encontrada para o usuário ${order.userId}. Atualizando...`);
-        subs.boxType         = order.boxType;
-        subs.planType        = planTypeString;
-        subs.startDate       = hoje;
+        console.log(`[SUCCESS] Atualizando assinatura existente para o usuário ${order.userId}...`);
+        subs.boxType = order.boxType;
+        subs.planType = planTypeString;
+        subs.startDate = hoje;
         subs.nextPaymentDate = dataProxima;
         subs.repetitionsLeft = repsLeft;
-        subs.status          = 'active'; // Garante que a assinatura seja reativada se estiver cancelada
+        subs.status = 'active';
       }
       
       await subs.save();
-      console.log(`[SUCCESS] Assinatura para o usuário ${order.userId} foi salva com sucesso no banco de dados!`);
-
+      console.log(`[SUCCESS] Assinatura para o usuário ${order.userId} salva com sucesso!`);
     } else {
-      console.log('[SUCCESS] O pedido NÃO é uma assinatura (compra única). Nenhuma ação de assinatura necessária.');
+      console.log('[SUCCESS] O pedido é uma compra única. Nenhuma ação de assinatura necessária.');
     }
 
-    return res.sendFile(
-      path.join(__dirname, '..', '..', 'payment', 'success.html')
-    );
+    return res.sendFile(path.join(__dirname, '..', '..', 'payment', 'success.html'));
   } catch (err) {
-    console.error('[SUCCESS-CRITICAL] Erro inesperado no bloco try/catch do callback de sucesso:', err);
-    return res.status(500).send('Erro interno ao processar o seu pagamento.');
+    console.error('[SUCCESS-CRITICAL] Erro inesperado no callback de sucesso:', err);
+    return res.status(500).send('Erro interno ao processar seu pagamento.');
   }
 });
 // ===================================================================
-// FIM DA SEÇÃO CORRIGIDA
+// FIM DA SEÇÃO FINAL E CORRIGIDA
 // ===================================================================
 
 router.get('/failure', (req, res) => {
