@@ -554,13 +554,40 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // =============================================================
+    // ***** INÍCIO DA LÓGICA ATUALIZADA *****
+    // =============================================================
     document.getElementById('login-action-button')?.addEventListener('click', function(event) {
-        event.stopPropagation();
-        document.getElementById('user-dropdown')?.classList.toggle('active');
-        if (loginModalOverlay?.classList.contains('active')) closeLoginModal();
-        if (registerModalOverlay?.classList.contains('active')) closeRegisterModal();
-        if (subscriptionPlansModal?.classList.contains('active')) closeSubscriptionPlansModal();
+        event.stopPropagation(); // Mantém o stopPropagation para evitar cliques indesejados
+
+        // Pega o elemento do menu hamburguer para verificar a visibilidade
+        const menuToggle = document.getElementById('menu-toggle');
+        // A maneira mais confiável de saber se estamos em mobile é verificar se o menu hamburguer está visível
+        const isMobile = menuToggle && window.getComputedStyle(menuToggle).display !== 'none';
+
+        if (isMobile) {
+            // LÓGICA PARA MOBILE
+            const token = localStorage.getItem('authToken'); // Verifica se o usuário está logado
+
+            if (token) {
+                // Se estiver logado, redireciona para a página da conta
+                window.location.href = 'minha-conta.html';
+            } else {
+                // Se não estiver logado, abre o modal de login
+                openLoginModal();
+            }
+        } else {
+            // LÓGICA PARA DESKTOP (comportamento original)
+            // Apenas abre o menu dropdown
+            document.getElementById('user-dropdown')?.classList.toggle('active');
+            if (loginModalOverlay?.classList.contains('active')) closeLoginModal();
+            if (registerModalOverlay?.classList.contains('active')) closeRegisterModal();
+            if (subscriptionPlansModal?.classList.contains('active')) closeSubscriptionPlansModal();
+        }
     });
+    // =============================================================
+    // ***** FIM DA LÓGICA ATUALIZADA *****
+    // =============================================================
 
     document.addEventListener('click', function(event) {
         const dropdown = document.getElementById('user-dropdown');
