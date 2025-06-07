@@ -327,7 +327,7 @@ main {
 }
 
 .logo img {
-    height: 167px;
+    height: 155px;
     width: auto;
     display: block;
     vertical-align: middle;
@@ -1324,7 +1324,7 @@ main {
     }
 
     .header .container { padding: 0 15px; }
-    .logo img { height: 45px; }
+    .logo img { height: 114px; }
 
     .nav-menu {
         position: fixed;
