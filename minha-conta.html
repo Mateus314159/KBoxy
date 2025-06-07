@@ -1,4 +1,3 @@
-<!-- public/minha-conta.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -9,104 +8,205 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/minha-conta.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Fredoka+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Fredoka+One&display=swap" rel="stylesheet">
 </head>
 <body>
     <header class="header">
         <div class="container">
             <a href="index.html#home" class="logo">
-                <img src="images/logo.png" alt="K-boxy Logo">
+                <img src="images/logo.png" alt="Logo K-boxy">
             </a>
-            <nav class="nav">
-                <a href="index.html#home">Home</a>
-                <a href="index.html#boxes">Boxes</a>
-                <a href="index.html#contact">Contato</a>
-                <a href="minha-conta.html" class="active">Minha Conta</a>
+            <nav class="nav-menu">
+                <ul class="nav-list">
+                    <li><a href="index.html#home" class="nav-link">Home</a></li>
+                    <li><a href="index.html#sobre" class="nav-link">Sobre</a></li>
+                    <li><a href="index.html#boxes" class="nav-link">Boxes</a></li>
+                    <li><a href="index.html#contato" class="nav-link">Contato</a></li>
+                </ul>
             </nav>
-            <div class="mobile-menu">
-                <i class="fas fa-bars"></i>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="window.location.href='index.html#boxes'">Compre Agora</button>
+                <div class="user-action-container">
+                    <button id="login-action-button" class="header-icon-btn" aria-label="Menu do usuário">
+                        <i class="fas fa-user-circle"></i>
+                    </button>
+                    <div id="user-dropdown" class="user-dropdown-menu">
+                    </div>
+                </div>
+                <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menu">
+                    <i class="fas fa-bars"></i>
+                </button>
             </div>
         </div>
     </header>
 
-    <main class="account-page">
-        <aside class="account-navigation">
-            <ul>
-                <li><a href="#perfil" id="link-perfil">Meu Perfil</a></li>
-                <li><a href="#assinatura" id="link-assinatura">Minha Assinatura</a></li>
-                <li><a href="#pedidos" id="link-pedidos">Meus Pedidos</a></li>
-                <li><a href="#enderecos" id="link-enderecos">Meus Endereços</a></li>
-                <li><a href="#seguranca" id="link-seguranca">Segurança</a></li>
-            </ul>
-        </aside>
-        <section class="account-content">
-            <!-- === Aba Perfil === -->
-            <div id="perfil" class="account-tab-content">
-                <!-- aqui fica seu formulário de perfil existente -->
-            </div>
-
-            <!-- === Aba Sua Assinatura === -->
-            <div id="assinatura" class="account-tab-content">
-                <h2>Sua Assinatura K-boxy</h2>
-
-                <!-- Loading -->
-                <div id="subscription-info-loading" style="display:none;">
-                  Carregando sua assinatura...
+    <main class="account-page-main-content">
+        <div class="container account-layout">
+            <aside class="account-sidebar">
+                <div class="account-profile-summary">
+                    <div class="profile-picture-container">
+                        <img id="user-avatar-img" src="https://placehold.co/100x100/f8bbd0/1A1A1A?text=K&font=Poppins" alt="Foto do Perfil" class="user-avatar">
+                        <label for="avatar-upload-input" class="edit-avatar-btn" title="Alterar foto">
+                            <i class="fas fa-camera"></i>
+                        </label>
+                        <input type="file" id="avatar-upload-input" accept="image/*" style="display:none;">
+                    </div>
+                    <h3 id="user-account-name">Nome do Usuário</h3>
+                    <p id="user-account-email">email@kpopper.com</p>
                 </div>
-
-                <!-- Detalhes da assinatura (preenchido via JS) -->
-                <div id="active-subscription-details" style="display:none;">
-                </div>
-
-                <!-- Caso não tenha assinatura -->
-                <div id="no-active-subscription" style="display:none;">
-                    <h3>Você ainda não é um assinante K-boxy! ✨</h3>
-                    <p>
-                        Imagine a emoção de receber uma caixa surpresa cheia de itens incríveis
-                        do seu universo K-Pop favorito, entregue na sua porta todos os meses! 
-                        Com a K-boxy, cada caixa é uma nova aventura.
-                    </p>
-                    <img src="images/FLcapa1.png" alt="Exemplo de K-Boxy" style="max-width:250px; border-radius:10px; margin:15px auto; display:block;">
-                    <p><strong>Nossos assinantes desfrutam de:</strong></p>
+                <nav class="account-navigation">
                     <ul>
-                        <li><i class="fas fa-gift"></i> Itens exclusivos e personalizados.</li>
-                        <li><i class="fas fa-tags"></i> Preços especiais em planos de longa duração.</li>
-                        <li><i class="fas fa-heart"></i> A alegria de ser surpreendido e fazer parte de uma comunidade apaixonada!</li>
+                        <li><a href="#perfil" data-section="perfil" class="active-account-tab"><i class="fas fa-user-cog"></i> Meu Perfil</a></li>
+                        <li><a href="#assinatura" data-section="assinatura"><i class="fas fa-star"></i> Sua Assinatura</a></li>
+                        <li><a href="#pedidos" data-section="pedidos"><i class="fas fa-receipt"></i> Meus Pedidos</a></li>
+                        <li><a href="#enderecos" data-section="enderecos"><i class="fas fa-map-marker-alt"></i> Endereços</a></li>
+                        <li><a href="#seguranca" data-section="seguranca"><i class="fas fa-shield-alt"></i> Segurança</a></li>
+                        <li><a href="#" id="account-page-logout"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
                     </ul>
-                    <button
-                      class="btn btn-primary btn-large"
-                      onclick="window.location.href='index.html#boxes'"
-                    >
-                      Quero Assinar Agora!
-                    </button>
+                </nav>
+            </aside>
+
+            <section class="account-main-section">
+                <div id="perfil" class="account-tab-content active-content">
+                    <h2>Meu Perfil</h2>
+                    <form id="profile-update-form">
+                        <div class="form-group">
+                            <label for="profile-input-name">Nome:</label>
+                            <input type="text" id="profile-input-name" placeholder="Como quer ser chamado?" autocomplete="name">
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-input-email">Email:</label>
+                            <input type="email" id="profile-input-email" readonly disabled autocomplete="email">
+                        </div>
+                        <h3>Seu Endereço Principal</h3>
+                        <div class="form-group">
+                            <label for="profile-input-street">Endereço (Rua, Número):</label>
+                            <input type="text" id="profile-input-street" name="street" placeholder="Ex: Rua das Flores, 123" autocomplete="street-address">
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-input-complement">Complemento (Apto, Bloco, etc.):</label>
+                            <input type="text" id="profile-input-complement" name="complement" placeholder="Ex: Apto 101, Bloco A" autocomplete="address-line2">
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-input-neighborhood">Bairro:</label>
+                            <input type="text" id="profile-input-neighborhood" name="neighborhood" placeholder="Ex: Jardim K-Pop" autocomplete="address-level3">
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-input-city">Cidade:</label>
+                            <input type="text" id="profile-input-city" name="city" placeholder="Ex: Seul" autocomplete="address-level2">
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-input-state">Estado (UF):</label>
+                            <input type="text" id="profile-input-state" name="state" placeholder="Ex: SP" maxlength="2" autocomplete="address-level1">
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-input-zipcode">CEP:</label>
+                            <input type="text" id="profile-input-zipcode" name="zipcode" placeholder="Ex: 01000-000" pattern="\d{5}-?\d{3}" autocomplete="postal-code">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                    </form>
+                    <p class="avatar-note">Para alterar sua foto, clique no ícone de câmera sobre a imagem ao lado.</p>
                 </div>
-            </div>
 
-            <!-- === Aba Meus Pedidos === -->
-            <div id="pedidos" class="account-tab-content">
-                <!-- seu código de “Meus Pedidos” existente -->
-            </div>
+                <div id="assinatura" class="account-tab-content">
+                    <h2>Sua Assinatura K-boxy</h2>
+                    <div id="subscription-info-loading" style="display:none;">Carregando sua assinatura...</div>
+                    <div id="active-subscription-details">
+                    </div>
+                    <div id="no-active-subscription" style="display:none;">
+                        <h3>Você ainda não é um assinante K-boxy! ✨</h3>
+                        <p>Imagine a emoção de receber uma caixa surpresa cheia de itens incríveis do seu universo K-Pop favorito, entregue na sua porta todos os meses! Com a K-boxy, cada caixa é uma nova aventura.</p>
+                        <img src="images/FLcapa1.png" alt="Exemplo de K-Boxy" style="max-width:250px; border-radius:10px; margin:15px auto; display:block;">
+                        <p><strong>Nossos assinantes desfrutam de:</strong></p>
+                        <ul>
+                            <li><i class="fas fa-gift"></i> Itens exclusivos e personalizados.</li>
+                            <li><i class="fas fa-tags"></i> Preços especiais em planos de longa duração.</li>
+                            <li><i class="fas fa-heart"></i> A alegria de ser surpreendido e fazer parte de uma comunidade apaixonada!</li>
+                        </ul>
+                        <button class="btn btn-primary btn-large" onclick="window.location.href='index.html#boxes'">Quero Assinar Agora!</button>
+                    </div>
+                </div>
 
-            <!-- === Aba Meus Endereços === -->
-            <div id="enderecos" class="account-tab-content">
-                <!-- seu código de “Meus Endereços” existente -->
-            </div>
+                <div id="pedidos" class="account-tab-content">
+                    <h2>Meus Pedidos</h2>
+                    <div id="orders-list-container">
+                    </div>
+                    <div id="no-orders-message" style="display:none;"><p>Você ainda não fez nenhum pedido. Que tal começar pela sua primeira K-Boxy?</p></div>
+                </div>
 
-            <!-- === Aba Segurança === -->
-            <div id="seguranca" class="account-tab-content">
-                <!-- seu código de “Segurança” existente -->
-            </div>
-        </section>
+                <div id="enderecos" class="account-tab-content">
+                    <h2>Meus Endereços</h2>
+
+                    <div id="address-display-loading" style="display:none; padding: 15px;">
+                        Carregando seu endereço...
+                    </div>
+
+                    <div id="address-display-area">
+                        <div id="address-card" class="address-card" style="display:none;">
+                            <p><strong>Endereço:</strong> <span id="addr-street"></span></p>
+                            <p><strong>Complemento:</strong> <span id="addr-complement"></span></p>
+                            <p><strong>Bairro:</strong> <span id="addr-neighborhood"></span></p>
+                            <p><strong>Cidade / Estado:</strong> <span id="addr-citystate"></span></p>
+                            <p><strong>CEP:</strong> <span id="addr-zipcode"></span></p>
+                        </div>
+                    </div>
+
+                    <div id="no-address-saved-message" style="display:none; padding: 15px;">
+                        <p>Você ainda não cadastrou um endereço.</p>
+                        <p>Por favor, preencha seu endereço na aba 
+                           <a href="#" class="account-nav-link-inline" data-section="perfil">Meu Perfil</a>.
+                        </p>
+                    </div>
+                </div>
+
+                <div id="seguranca" class="account-tab-content"> 
+                    <h2>Segurança</h2>
+                    <form id="change-password-form-account">
+                        <h3>Alterar Senha</h3>
+                        <div class="form-group">
+                            <label for="current-password-page">Senha Atual:</label>
+                            <input type="password" id="current-password-page" required autocomplete="current-password">
+                        </div>
+                        <div class="form-group">
+                            <label for="new-password-page">Nova Senha:</label>
+                            <input type="password" id="new-password-page" required minlength="6" autocomplete="new-password">
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm-new-password-page">Confirmar Nova Senha:</label>
+                            <input type="password" id="confirm-new-password-page" required autocomplete="new-password">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Salvar Nova Senha</button>
+                    </form>
+                </div>
+
+            </section>
+        </div>
     </main>
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 K-boxy. Todos os direitos reservados.</p>
-            <div class="social-links">
-                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                <a href="#" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
-                <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <div class="footer-content">
+                <div class="footer-about">
+                    <h3 class="footer-logo">K-boxy ✨</h3>
+                    <p>Sua dose mensal de felicidade K-Pop!</p>
+                    <p>&copy; <span id="currentYear"></span> K-boxy. Todos os direitos reservados.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Links Rápidos</h4>
+                    <ul>
+                        <li><a href="index.html#sobre">Sobre Nós</a></li>
+                        <li><a href="index.html#boxes">Nossas Boxes</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Política de Privacidade</a></li>
+                    </ul>
+                </div>
+                <div class="footer-social">
+                    <h4>Siga-nos</h4>
+                    <a href="#" target="_blank" aria-label="Instagram K-boxy"><i class="fab fa-instagram"></i></a>
+                    <a href="#" target="_blank" aria-label="TikTok K-boxy"><i class="fab fa-tiktok"></i></a>
+                    <a href="#" target="_blank" aria-label="YouTube K-boxy"><i class="fab fa-youtube"></i></a>
+                    <a href="#" target="_blank" aria-label="Twitter K-boxy"><i class="fab fa-twitter"></i></a>
+                </div>
             </div>
         </div>
     </footer>

@@ -182,57 +182,49 @@ router.get('/success', async (req, res) => {
       // 2) Procurar no banco o Order que foi criado antes do checkout e armazenou esse paymentId
       //    (supondo que, ao criar a ordem, você tenha salvo paymentId = prefId e userId)
       const order = await Order.findOne({ paymentId: prefId });
-      if (order && order.isSubscription) {
-        // 3) Se for uma assinatura recorrente, calcular dados necessários
-        const hoje = new Date();
-        // 3.1) Próxima cobrança = hoje + 1 mês
-        const dataProxima = new Date(hoje);
-        dataProxima.setMonth(dataProxima.getMonth() + 1);
-
-        // 3.2) Cálculo de quantas repetições ainda faltam:
-        //      Se order.planType armazenar número de meses (por ex. 6 ou 12), usamos:
-        //      repsLeft = order.planType - 1
-        const duracao = parseInt(order.planType, 10); 
-        // (ex.: “6” para plano semestral) 
-        const repsLeft = duracao > 1 ? (duracao - 1) : 0;
-
-        // 4) Procurar inscrição ativa para o mesmo usuário
-        let subs = await Subscription.findOne({ userId: order.userId, status: 'active' });
-        if (!subs) {
-          // 4.1) Se não existir, criar um novo documento
-          subs = new Subscription({
-            userId:          order.userId,
-            boxType:         order.boxType,
-            planType:        order.planType === '1' ? 'one_time' 
-                              : (order.planType === '6' ? 'semiannual' 
-                              : (order.planType === '12' ? 'annual' : order.planType)),
-            startDate:       new Date(),
-            nextPaymentDate: dataProxima,
-            repetitionsLeft: repsLeft,
-            status:          'active'
-          });
-        } else {
-          // 4.2) Se já existia, apenas atualizar: reiniciar datas e repetições
-          subs.boxType         = order.boxType;
-          subs.planType        = order.planType === '1' ? 'one_time' 
-                                : (order.planType === '6' ? 'semiannual' 
-                                : (order.planType === '12' ? 'annual' : order.planType));
-          subs.startDate       = new Date();
-          subs.nextPaymentDate = dataProxima;
-          subs.repetitionsLeft = repsLeft;
-          subs.status          = 'active';
-        }
-        await subs.save();
-        console.log('Assinatura criada/atualizada para userId=', order.userId);
-      } else {
-        // Se não for uma assinatura recorrente, não faz nada de assinatura
-        console.log('Order não é assinatura recorrente ou não foi encontrado no banco:', prefId);
-      }
-    }
-  } catch (err) {
-    console.error('Erro ao criar/atualizar assinatura no callback:', err);
-    // Mesmo em caso de erro, a gente segue para enviar o success.html
-  }
+      
+      
++   if (order && order.isSubscription) {
++     // 3) Se for uma assinatura recorrente, calcular dados necessários
++     const hoje = new Date();
++     const dataProxima = new Date(hoje);
++     dataProxima.setMonth(dataProxima.getMonth() + 1);
++
++     // 3.2) Quantas repetições ainda faltam
++     const duracao = parseInt(order.planType, 10);
++     const repsLeft = duracao > 1 ? (duracao - 1) : 0;
++
++     // 4) Procurar subscription ativa do usuário
++     let subs = await Subscription.findOne({ userId: order.userId, status: 'active' });
++     if (!subs) {
++       // 4.1) Criar nova assinatura
++       subs = new Subscription({
++         userId:          order.userId,
++         boxType:         order.boxType,
++         planType:        order.planType === '1'   ? 'one_time'
++                         : order.planType === '6'   ? 'semiannual'
++                         : order.planType === '12'  ? 'annual'
++                         : order.planType,
++         startDate:       new Date(),
++         nextPaymentDate: dataProxima,
++         repetitionsLeft: repsLeft,
++         status:          'active'
++       });
++     } else {
++       // 4.2) Atualizar assinatura existente
++       subs.boxType         = order.boxType;
++       subs.planType        = order.planType === '1'   ? 'one_time'
++                             : order.planType === '6'   ? 'semiannual'
++                             : order.planType === '12'  ? 'annual'
++                             : order.planType;
++       subs.startDate       = new Date();
++       subs.nextPaymentDate = dataProxima;
++       subs.repetitionsLeft = repsLeft;
++       subs.status          = 'active';
++     }
++     // 4.3) Salvar no banco
++     await subs.save();
++   }
 
   // 5) Enviar a página de sucesso para o cliente
   return res.sendFile(path.join(__dirname, '..', '..', 'payment', 'success.html'));
