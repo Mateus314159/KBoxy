@@ -21,11 +21,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- Seletor do Ano no Rodapé ---
     const currentYearSpan = document.getElementById('currentYear');
 
-    // --- Carrossel Swiper para Boxes Mobile ---
+    // --- Carrossel Swiper ---
     const boxCarouselMobile = document.querySelector('.box-carousel-mobile');
-    const swiperWrapper = boxCarouselMobile ? boxCarouselMobile.querySelector('.swiper-wrapper') : null;
-    const desktopBoxCards = document.querySelectorAll('.boxes-grid .box-card');
-
+    
     // --- Seletores para o Modal de Detalhes da Box ---
     const boxDetailsModal = document.getElementById('boxDetailsModal');
     const closeBoxDetailsModalBtn = boxDetailsModal ? boxDetailsModal.querySelector('.close-modal-btn') : null;
@@ -438,7 +436,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const boxCard = this.closest('.box-card');
             if (boxCard) {
                 const boxId = boxCard.dataset.boxid;
-                if (boxId) openSubscriptionPlansModal(boxId);
+                // Exceção para o botão da Mini K-BOXY que já tem um onclick para o checkout
+                if (boxId && boxId !== 'miniKBoxyPromo') {
+                    openSubscriptionPlansModal(boxId);
+                }
             }
         });
     });
@@ -537,48 +538,59 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     if (typeof AOS !== 'undefined') { AOS.init({ duration: 800, once: false, offset: 50, easing: 'ease-in-out-quad', mirror: true }); }
-
-    if (boxCarouselMobile && swiperWrapper && desktopBoxCards.length > 0) {
-        desktopBoxCards.forEach(card => {
-            const swiperSlide = document.createElement('div');
-            swiperSlide.className = 'swiper-slide';
-            swiperSlide.appendChild(card.cloneNode(true));
-            swiperWrapper.appendChild(swiperSlide);
-        });
+    
+    // INÍCIO DA ALTERAÇÃO
+    // Inicializa o Swiper para o carrossel de boxes, agora para todas as telas.
+    if (boxCarouselMobile) {
         new Swiper('.box-carousel-mobile', {
-            slidesPerView: 1, spaceBetween: 15, loop: false, grabCursor: true,
+            // Configurações base
+            loop: false,
+            grabCursor: true,
+            
+            // Paginação e Navegação
             pagination: { el: '.swiper-pagination', clickable: true },
             navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
-            breakpoints: { 480: { slidesPerView: 1.2 }, 640: { slidesPerView: 1.5 } },
+            
+            // Breakpoints para um carrossel responsivo
+            breakpoints: {
+                // Em telas com largura >= 320px
+                320: {
+                    slidesPerView: 1.1,
+                    spaceBetween: 15
+                },
+                // Em telas com largura >= 768px (tablets)
+                768: {
+                    slidesPerView: 2,
+                    spaceBetween: 20
+                },
+                // Em telas com largura >= 1024px (desktops)
+                1024: {
+                    slidesPerView: 3,
+                    spaceBetween: 30
+                }
+            },
             on: { init: () => { if (typeof AOS !== 'undefined') AOS.refreshHard(); } }
         });
     }
+    // FIM DA ALTERAÇÃO
 
     // =============================================================
     // ***** INÍCIO DA LÓGICA ATUALIZADA *****
     // =============================================================
     document.getElementById('login-action-button')?.addEventListener('click', function(event) {
-        event.stopPropagation(); // Mantém o stopPropagation para evitar cliques indesejados
+        event.stopPropagation();
 
-        // Pega o elemento do menu hamburguer para verificar a visibilidade
         const menuToggle = document.getElementById('menu-toggle');
-        // A maneira mais confiável de saber se estamos em mobile é verificar se o menu hamburguer está visível
         const isMobile = menuToggle && window.getComputedStyle(menuToggle).display !== 'none';
 
         if (isMobile) {
-            // LÓGICA PARA MOBILE
-            const token = localStorage.getItem('authToken'); // Verifica se o usuário está logado
-
+            const token = localStorage.getItem('authToken');
             if (token) {
-                // Se estiver logado, redireciona para a página da conta
                 window.location.href = 'minha-conta.html';
             } else {
-                // Se não estiver logado, abre o modal de login
                 openLoginModal();
             }
         } else {
-            // LÓGICA PARA DESKTOP (comportamento original)
-            // Apenas abre o menu dropdown
             document.getElementById('user-dropdown')?.classList.toggle('active');
             if (loginModalOverlay?.classList.contains('active')) closeLoginModal();
             if (registerModalOverlay?.classList.contains('active')) closeRegisterModal();
@@ -615,7 +627,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function handleBackToTopButton() {
-        if (backToTopBtn) { window.scrollY > 300 ? backToTopBtn.classList.add('show') : backToTopBtn.classList.remove('show'); }
+        if (backToTopBtn) { window.scrollY > 300 ? backToTopBtn.classList.add('show') : backToToTopBtn.classList.remove('show'); }
     }
     
     backToTopBtn?.addEventListener('click', (e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); });

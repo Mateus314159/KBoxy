@@ -121,7 +121,6 @@ main {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
-    /* overflow-x: hidden;  Removido daqui, pois o html/body já cuidam disso globalmente */
 }
 
 .section-padding {
@@ -221,10 +220,6 @@ main {
     border: 2px solid var(--accent-color);
 }
 
-
-
-
-
 .btn-large {
     padding: 15px 35px;
     font-size: 1.1rem;
@@ -293,8 +288,6 @@ main {
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-
-
 .header.scrolled {
     background-color: var(--card-bg-color);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
@@ -316,10 +309,8 @@ main {
   object-fit: cover;
   vertical-align: middle;
   border: 1px solid var(--primary-color);
-  /* caso queira espaço entre avatar e próximas letras/ícones */
   margin-right: 4px;
 }
-
 
 .logo {
     text-decoration: none;
@@ -334,7 +325,7 @@ main {
 }
 
 .nav-menu {
-    display: flex; /* Visível por padrão (desktop) */
+    display: flex;
      transition: transform 0.3s ease-in-out;
 }
 .nav-list {
@@ -400,11 +391,10 @@ main {
 
 .theme-toggle-btn {
     font-size: 1.5rem;
-    /* Herda outros estilos de .header-icon-btn se tiver essa classe no HTML */
 }
 
 .menu-toggle {
-    display: none; /* Escondido no desktop */
+    display: none;
     font-size: 1.8rem;
     background: none;
     border: none;
@@ -425,7 +415,6 @@ main {
 #login-action-button {
     position: relative;
     z-index: 1002;
-    /* Herda de .header-icon-btn */
 }
 
 .user-dropdown-menu {
@@ -515,7 +504,7 @@ main {
     width: 100%;
     height: 100%;
     z-index: 1;
-    background-color: rgba(0, 0, 0, 0.6); /* Ajuste este valor */
+    background-color: rgba(0, 0, 0, 0.6);
 }
 
 .banner-content {
@@ -559,8 +548,6 @@ main {
     color: var(--primary-color);
 }
 
-
-
 .banner-subtitle {
     font-size: 1.3rem;
     margin-bottom: 30px;
@@ -574,12 +561,11 @@ main {
 /* ## ABOUT SECTION ## */
 .about-section {
     background-color: var(--bg-color);
-    min-height: 100vh; /* Permite que a seção cresça com o conteúdo */
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
-
 
 .about-content {
     display: flex;
@@ -617,17 +603,16 @@ main {
     margin: 0 auto;
 }
 
-/* ## BOXES SECTION (GRID & CAROUSEL) ## */
+/* ## BOXES SECTION (CAROUSEL-ONLY) ## */
 .boxes-section {
     background: var(--gradient-accent);
     padding-top: 80px;
     padding-bottom: 80px;
-    min-height: 100vh; /* Permite que a seção cresça */
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
-
 
 .boxes-section .section-title {
     margin-bottom: 60px;
@@ -637,7 +622,7 @@ main {
 .box-card {
     background-color: var(--card-bg-color);
     border-radius: 15px;
-    overflow: hidden; /* Conteúdo interno como texto será cortado se exceder o padding */
+    overflow: hidden;
     box-shadow:
         0 2px 5px rgba(0, 0, 0, 0.06),
         0 8px 16px rgba(0, 0, 0, 0.07),
@@ -648,16 +633,7 @@ main {
     height: 100%;
 }
 
-/* Hover para Desktop */
-.boxes-grid .box-card:hover { /* Aplicar hover 3D apenas no grid desktop */
-    transform: translateY(-12px) scale(1.03) translateZ(25px) rotateY(7deg);
-    box-shadow:
-        0 4px 8px rgba(0, 0, 0, 0.08),
-        0 12px 24px rgba(0, 0, 0, 0.1),
-        0 22px 45px rgba(0, 0, 0, 0.08);
-}
-
-.box-image { /* Padronizado */
+.box-image {
     width: 100%;
     height: 220px;
     object-fit: cover;
@@ -668,12 +644,8 @@ main {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
+    text-align: justify;
 }
-
-.box-card-content {
-  text-align: justify;
-}
-
 
 .box-name {
     font-family: var(--font-pop);
@@ -699,29 +671,15 @@ main {
     margin-bottom: 20px;
     flex-grow: 1;
     overflow-wrap: break-word;
-    /* Para limitar a altura da descrição e adicionar scroll INTERNO ao parágrafo:
-    max-height: 7.5em; /* Aproximadamente 5 linhas, ajuste conforme necessário (line-height * número de linhas) */
-    /* overflow-y: auto; */
-    /* padding-right: 5px; /* Espaço para a barra de rolagem não cobrir o texto */
 }
 
 .box-card .btn-ver-mais {
     margin-top: auto;
 }
 
-/* ### Boxes Grid (VISÍVEL NO DESKTOP POR PADRÃO) ### */
-.boxes-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 30px;
-    align-items: stretch;
-    justify-content: center;
-    perspective: 1000px; /* Para o hover 3D */
-}
-
-/* ### Boxes Carousel (ESCONDIDO NO DESKTOP POR PADRÃO) ### */
+/* ### Boxes Carousel (SEMPRE VISÍVEL) ### */
 .box-carousel-mobile {
-    display: none;
+    display: block; /* ALTERAÇÃO: Tornar visível por padrão */
     padding-bottom: 50px;
     overflow: hidden;
     width: 100%;
@@ -737,9 +695,18 @@ main {
 
 .box-carousel-mobile .box-card {
     width: 100%;
-    max-width: 350px;
+    max-width: 380px; /* Aumentado um pouco para desktop */
     margin-left: auto;
     margin-right: auto;
+}
+
+/* Efeito de hover para o card dentro do carrossel (válido para todas as telas) */
+.box-carousel-mobile .box-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow:
+        0 4px 8px rgba(0, 0, 0, 0.08),
+        0 12px 24px rgba(0, 0, 0, 0.09),
+        0 20px 40px rgba(0, 0, 0, 0.07);
 }
 
 /* Estilos do Swiper */
@@ -747,13 +714,16 @@ main {
 .swiper-button-prev {
     color: var(--primary-color) !important;
     border-radius: 50%;
-    width: 40px !important;
-    height: 40px !important;
-    transition: color 0.3s ease;
+    width: 44px !important; /* Um pouco maior para desktop */
+    height: 44px !important;
+    background-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    transition: color 0.3s ease, background-color 0.3s ease;
 }
 .swiper-button-next:hover,
 .swiper-button-prev:hover {
-    color: var(--secondary-color) !important;
+    color: var(--light-color) !important;
+    background-color: var(--primary-color) !important;
 }
 .swiper-button-next::after,
 .swiper-button-prev::after {
@@ -762,6 +732,9 @@ main {
 .swiper-pagination-bullet {
     background-color: var(--light-color) !important;
     opacity: 0.6 !important;
+    width: 10px !important;
+    height: 10px !important;
+    transition: background-color 0.3s ease;
 }
 .swiper-pagination-bullet-active {
     background-color: var(--primary-color) !important;
@@ -772,12 +745,12 @@ main {
 .box-details-modal {
     display: none;
     position: fixed;
-    z-index: 2001; /* Acima dos modais de login/registro se eles são 2000 */
+    z-index: 2001;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: hidden; /* Overlay não rola */
+    overflow: hidden;
     background-color: rgba(0,0,0,0.6);
     align-items: center;
     justify-content: center;
@@ -789,15 +762,15 @@ main {
     padding: 30px;
     border-radius: 15px;
     width: 90%;
-    max-width: 600px; /* Padrão para detalhes da box */
+    max-width: 600px;
     position: relative;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     animation: slideDownModal 0.5s ease-out;
-    max-height: 90vh; /* Limita altura do modal */
-    overflow-y: auto; /* Adiciona scroll se o conteúdo interno for muito grande */
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
-.close-modal-btn { /* Para o modal de detalhes da box */
+.close-modal-btn {
     color: var(--text-color);
     opacity: 0.7;
     position: absolute;
@@ -807,7 +780,7 @@ main {
     font-weight: bold;
     cursor: pointer;
     transition: color 0.3s ease, opacity 0.3s ease;
-    z-index: 1; /* Para ficar acima de outros conteúdos do modal */
+    z-index: 1;
 }
 .close-modal-btn:hover,
 .close-modal-btn:focus {
@@ -833,7 +806,6 @@ main {
     overflow-wrap: break-word;
 }
 
-
 #modalBoxPrice {
     font-size: 1.4rem;
     font-weight: bold;
@@ -848,7 +820,7 @@ main {
 }
 #modalBoxDescriptionFull ul {
     list-style-position: inside;
-    padding-left: 0; /* Ajustado para melhor alinhamento com list-style-position: inside */
+    padding-left: 0;
 }
 #modalBoxDescriptionFull li {
     margin-bottom: 5px;
@@ -885,8 +857,6 @@ main {
     transform: translateY(-5px) scale(1.01);
 }
 
-
-
 .testimonial-avatar {
     width: 80px;
     height: 80px;
@@ -919,7 +889,7 @@ main {
     background-image: var(--gradient-primary);
     color: var(--light-color);
     text-align: center;
-    min-height: 100vh; /* Ou 50vh se estiver no dual-wrapper */
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -982,8 +952,6 @@ main {
     padding: 50px 0;
     font-size: 0.9rem;
 }
-
-
 
 .footer-content {
     display: grid;
@@ -1095,7 +1063,7 @@ main {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.65);
-    display: none; /* JS controla para flex */
+    display: none;
     align-items: center;
     justify-content: center;
     z-index: 2000;
@@ -1112,7 +1080,7 @@ main {
     transition: opacity 0.3s ease-in-out, visibility 0s linear 0s;
 }
 
-.login-modal-content { /* Especificamente para login/registro, para não conflitar com .modal-content de detalhes da box */
+.login-modal-content {
      background-color: #FFFFFF;
     padding: 40px 45px;
     border-radius: 12px;
@@ -1135,12 +1103,12 @@ main {
 }
 
 .login-modal-content h2 {
-    font-family: 'Poppins', sans-serif; /* Alterado de var(--font-pop) */
-    color: #333333; /* Um cinza escuro e elegante, em vez de var(--primary-color) aqui */
-    margin-bottom: 35px; /* Aumentar um pouco o espaçamento inferior */
-    font-size: 1.9rem;   /* Ajuste conforme o visual desejado (era 2.2rem) */
+    font-family: 'Poppins', sans-serif;
+    color: #333333;
+    margin-bottom: 35px;
+    font-size: 1.9rem;
     font-weight: 600;
-    letter-spacing: 0.5px; /* Espaçamento sutil entre as letras */
+    letter-spacing: 0.5px;
 }
 
 
@@ -1151,21 +1119,21 @@ main {
 
 .form-group label {
     font-family: 'Poppins', sans-serif;
-    font-weight: 500; /* Um pouco menos pesado */
+    font-weight: 500;
     margin-bottom: 8px;
-    font-size: 0.875rem; /* 14px */
-    color: #555555; /* Cinza médio */
+    font-size: 0.875rem;
+    color: #555555;
 }
 
 .form-group input[type="email"],
 .form-group input[type="password"],
-.form-group input[type="text"] { /* Adicionado type="text" para consistência, caso use */
+.form-group input[type="text"] {
     width: 100%;
-    padding: 14px 18px; /* Bom padding interno */
-    border: 1px solid #DDE2E5; /* Borda cinza clara, profissional */
-    border-radius: 8px; /* Cantos suavemente arredondados */
-    font-size: 0.9375rem; /* 15px */
-    background-color: #F9FAFB; /* Fundo muito levemente acinzentado/azulado */
+    padding: 14px 18px;
+    border: 1px solid #DDE2E5;
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    background-color: #F9FAFB;
     color: #333333;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -1175,12 +1143,11 @@ main {
 .form-group input[type="text"]:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(var(--rgb-primary-color), 0.15); /* Sombra de foco suave */
+    box-shadow: 0 0 0 3px rgba(var(--rgb-primary-color), 0.15);
 }
 
 .form-group input::placeholder {
-    color: #A0A0A0; /* Placeholder um pouco mais escuro para melhor leitura */
-    /* font-style: italic; /* Opcional */
+    color: #A0A0A0;
 }
 
 .password-wrapper {
@@ -1209,21 +1176,21 @@ main {
 
 .form-switch {
     margin-top: 28px;
-    font-size: 0.875rem; /* 14px */
+    font-size: 0.875rem;
 }
 
 .form-switch a {
-    color: var(--primary-color); /* Manter a cor primária para ações clicáveis */
+    color: var(--primary-color);
     text-decoration: none;
     font-weight: 500;
 }
 
 .form-switch a:hover {
     text-decoration: underline;
-    color: var(--secondary-color); /* Um hover mais suave */
+    color: var(--secondary-color);
 }
 
-.close-modal-icon-btn { /* Para Login/Register Modals */
+.close-modal-icon-btn {
     position: absolute;
     top: 15px;
     right: 15px;
@@ -1236,7 +1203,7 @@ main {
     line-height: 1;
     padding: 5px;
     transition: color 0.3s ease, opacity 0.3s ease;
-    z-index: 1; /* Para ficar acima de outros conteúdos do modal */
+    z-index: 1;
 }
 .close-modal-icon-btn:hover {
     opacity: 1;
@@ -1249,32 +1216,26 @@ main {
 .dual-section-wrapper {
     display: flex;
     flex-direction: column;
-    /* Se as seções internas definem a altura, o wrapper não precisa de min-height: 100vh */
 }
 
 .half-height-section {
-    flex: 1; /* Se dentro de .dual-section-wrapper, isso ajuda a dividir o espaço */
+    flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
     padding: 30px 0;
-    overflow: hidden; /* Corta conteúdo que exceder esta seção de meia altura */
+    overflow: hidden;
     min-height: 50vh;
 }
 
-/* Seções de tela cheia - ajuste para controle de conteúdo interno */
 .about-section,
 .boxes-section,
-.testimonials-section, /* Se não estiver em .dual-section-wrapper */
-.contact-section { /* Se não estiver em .dual-section-wrapper */
-    min-height: 100vh; /* Permite que a seção cresça, se necessário */
+.testimonials-section,
+.contact-section {
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    /* Para forçar a altura e fazer o conteúdo INTERNO rolar, se exceder: */
-    /* height: 100vh; */
-    /* overflow-y: auto; */
-    /* justify-content: flex-start; /* Alinha o conteúdo ao topo para rolagem */
 }
 
 .about-section .container,
@@ -1301,13 +1262,12 @@ main {
     .about-image { margin-top: 30px; }
     .about-image img { max-width: 60%; }
 
-    /* Ajuste para ações do header em telas médias */
     .header-actions .btn-primary {
         padding: 10px 15px;
         font-size: 0.9rem;
     }
     .header-icon-btn, .theme-toggle-btn, .menu-toggle {
-        margin-left: 10px; /* Reduz um pouco o espaçamento */
+        margin-left: 10px;
     }
 }
 
@@ -1343,7 +1303,6 @@ main {
         z-index: 999;
     }
   
-
     .nav-list { flex-direction: column; width: 100%; }
     .nav-list li { margin-left: 0; margin-bottom: 20px; width: 100%; }
     .nav-link { font-size: 1.2rem; display: block; padding: 10px 0; }
@@ -1355,13 +1314,12 @@ main {
     .menu-toggle .fa-times { display: none; }
 
     .header-actions .btn-primary { display: none; }
-    .header-actions { /* Ajuste para os ícones restantes */
-        gap: 0; /* Remove gap se os botões estiverem muito juntos */
+    .header-actions {
+        gap: 0;
     }
     #login-action-button { margin-left: auto; font-size: 1.8rem; }
     .theme-toggle-btn { margin-left: 10px; font-size: 1.5rem;}
     .menu-toggle { margin-left: 10px; font-size: 1.8rem;}
-
 
     .banner-title { font-size: 2rem; }
     .banner-subtitle { font-size: 1rem; }
@@ -1370,15 +1328,7 @@ main {
     .banner-title .animated-letter:not(.highlight-letter):hover { color: var(--light-color); }
     .banner-title .animated-letter.highlight-letter:hover { color: var(--primary-color); }
 
-    .boxes-grid { display: none !important; }
-    .box-carousel-mobile { display: block !important; }
-    .box-carousel-mobile .box-card:hover {
-        transform: translateY(-5px) scale(1.02);
-        box-shadow:
-            0 3px 6px rgba(0, 0, 0, 0.07),
-            0 10px 20px rgba(0, 0, 0, 0.08),
-            0 18px 35px rgba(0, 0, 0, 0.06);
-    }
+    /* ALTERAÇÃO: As regras que alternavam grid e carrossel foram REMOVIDAS daqui */
 
     .newsletter-form { flex-direction: column; gap: 15px; }
     .newsletter-input, .newsletter-form .btn { width: 100%; }
@@ -1396,24 +1346,8 @@ main {
 
 /* Desktop Styles (Reforço e Correções) */
 @media (min-width: 769px) {
-    .boxes-grid {
-        display: grid !important; /* Garante que o grid seja exibido */
-    }
-    .box-carousel-mobile {
-        display: none !important;
-        height: 0 !important;
-        overflow: hidden !important;
-        visibility: hidden !important;
-        padding: 0 !important;
-        margin: 0 !important;
-    }
-    .boxes-grid .box-card:hover { /* Hover original desktop */
-        transform: translateY(-12px) scale(1.03) translateZ(25px) rotateY(7deg);
-        box-shadow:
-            0 4px 8px rgba(0, 0, 0, 0.08),
-            0 12px 24px rgba(0, 0, 0, 0.1),
-            0 22px 45px rgba(0, 0, 0, 0.08);
-    }
+    /* ALTERAÇÃO: As regras que forçavam a exibição do grid e escondiam o carrossel foram REMOVIDAS daqui */
+
     /* Garante que o menu mobile e toggle não apareçam no desktop */
     .nav-menu {
         position: static;
@@ -1425,13 +1359,13 @@ main {
         box-shadow: none;
         flex-direction: row;
         padding: 0;
-        overflow-y: visible; /* Menu desktop não precisa de scroll interno */
+        overflow-y: visible;
     }
-    .nav-list { flex-direction: row; } /* Já definido, mas para reforçar */
+    .nav-list { flex-direction: row; }
     .nav-list li { margin-left: 25px; margin-bottom: 0; width: auto; }
     .menu-toggle { display: none !important; }
-    .header-actions .btn-primary { display: inline-block; } /* Mostra "Compre Agora" */
-    .header-actions #theme-toggle { display: flex; } /* Garante que o theme-toggle seja visível */
+    .header-actions .btn-primary { display: inline-block; }
+    .header-actions #theme-toggle { display: flex; }
 }
 
 /* Small Mobile Styles */
@@ -1447,9 +1381,7 @@ main {
     .box-price { font-size: 1.1rem; }
 
     .login-modal-content { padding: 25px 20px; max-width: 90%;}
-    /* Para o modal de detalhes da box, se usar .modal-content */
     .box-details-modal .modal-content { padding: 25px 20px; max-width: 90%;}
-
 
     .login-modal-content h2 { font-size: 1.8rem; }
 
@@ -1458,9 +1390,7 @@ main {
 
 /* Hover Media Query (para desabilitar certos hovers em touch) */
 @media (hover: none) and (pointer: coarse) {
-    /* .banner-title .animated-letter:hover já tratado em (max-width: 768px) */
     .btn:hover {
-        /* Mantém o estado base no toque, evitando hover "grudado" */
         transform: translateY(0);
         box-shadow: 0 3px 0px rgba(0, 0, 0, 0.2),
                     0 5px 8px rgba(0, 0, 0, 0.15);
@@ -1473,7 +1403,7 @@ main {
                     0 5px 8px rgba(0, 0, 0, 0.1);
         filter: brightness(100%);
     }
-    .box-card:hover { /* Desabilita o hover 3D complexo no toque */
+    .box-card:hover {
         transform: none;
         box-shadow:
             0 2px 5px rgba(0, 0, 0, 0.06),
@@ -1484,7 +1414,6 @@ main {
 /*------------------------------------*\
     #SUBSCRIPTION PLANS MODAL (NOVO)
 \*------------------------------------*/
-/* .modal-overlay já possui estilos base. Vamos focar no conteúdo específico. */
 
 .subscription-plans-modal-content {
     background-color: var(--card-bg-color);
@@ -1492,23 +1421,22 @@ main {
     border-radius: 12px;
     box-shadow: 0 8px 30px rgba(0,0,0,0.18);
     width: 90%;
-    max-width: 700px; /* Ajuste conforme necessário, pode ser maior que o de login */
+    max-width: 700px;
     text-align: center;
-    position: relative; /* Para o botão de fechar */
-    transform: scale(0.95) translateY(-15px); /* Animação de entrada */
+    position: relative;
+    transform: scale(0.95) translateY(-15px);
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease-in-out;
     opacity: 0;
-    max-height: 90vh; /* Para permitir scroll interno se necessário */
-    overflow-y: auto; /* Adiciona scroll se o conteúdo exceder a altura */
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
-/* Estado ativo para animação de entrada do modal de planos */
 .modal-overlay.active .subscription-plans-modal-content {
     transform: scale(1) translateY(0);
     opacity: 1;
 }
 
-#subscriptionBoxNameModalTitle { /* Usando ID específico do HTML */
+#subscriptionBoxNameModalTitle {
     font-family: var(--font-pop);
     color: var(--primary-color);
     margin-bottom: 25px;
@@ -1519,12 +1447,12 @@ main {
 .plans-list {
     display: flex;
     flex-direction: column;
-    gap: 20px; /* Espaçamento entre os itens de plano */
+    gap: 20px;
     margin-top: 20px;
 }
 
 .plan-item {
-    background-color: var(--bg-color); /* Um fundo sutilmente diferente */
+    background-color: var(--bg-color);
     padding: 20px;
     border-radius: 10px;
     border: 1px solid var(--border-color);
@@ -1538,9 +1466,9 @@ main {
 }
 
 .plan-item h4 {
-    font-family: 'Poppins', sans-serif; /* Mantém consistência */
-    font-weight: 700; /* Mais destaque */
-    color: var(--dark-color); /* Cor de texto principal para o título do plano */
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    color: var(--dark-color);
     font-size: 1.3rem;
     margin-bottom: 8px;
 }
@@ -1548,7 +1476,7 @@ main {
 .plan-item .plan-price {
     font-size: 1.15rem;
     font-weight: 600;
-    color: var(--primary-color); /* Destaque no preço */
+    color: var(--primary-color);
     margin-bottom: 5px;
 }
 
@@ -1568,32 +1496,21 @@ main {
 }
 
 .plan-item .btn-select-plan {
-    display: block; /* Ocupa toda a largura do card do plano */
+    display: block;
     width: 100%;
     margin-top: 10px;
-    /* Herda estilos de .btn .btn-secondary .btn-small */
-    /* Se precisar de ajustes específicos, adicione aqui: */
-    /* Exemplo: background: var(--accent-color); color: var(--dark-color); */
-}
-.plan-item .btn-select-plan:hover {
-    /* Exemplo: background: var(--secondary-color); color: var(--light-color); */
 }
 
-/* Botão de fechar para o modal de planos (herda .close-modal-icon-btn) */
 #close-subscription-plans-modal-btn {
-    /* Se precisar de ajustes específicos, podem ser feitos aqui. */
-    /* Por exemplo, se a cor padrão não contrastar bem com o novo modal. */
 }
 
 /* ===== Ajuste só no mobile: logo mais à esquerda ===== */
 @media (max-width: 768px) {
-  /* reduz o padding do container para aproximar tudo da borda */
   .header .container {
-    padding-left: 0.5rem;  /* diminua até ficar no ponto */
-    padding-right: 0.1rem; /* mantém simetria */
+    padding-left: 0.5rem;
+    padding-right: 0.1rem;
   }
 
-  /* remove qualquer margin extra da logo */
   .header .container .logo {
     margin-left: 0;
   }
@@ -1603,11 +1520,11 @@ main {
 /* Responsividade para o modal de planos */
 @media (max-width: 768px) {
     .subscription-plans-modal-content {
-        padding: 25px 20px; /* Menos padding em telas menores */
+        padding: 25px 20px;
         max-width: 95%;
     }
     #subscriptionBoxNameModalTitle {
-        font-size: 1.6rem; /* Título menor */
+        font-size: 1.6rem;
     }
     .plan-item h4 {
         font-size: 1.1rem;
@@ -1633,7 +1550,7 @@ main {
         font-size: 1.05rem;
     }
     .plan-item .btn-select-plan {
-        padding: 8px 15px; /* Ajusta o padding do botão interno se necessário */
+        padding: 8px 15px;
         font-size: 0.9rem;
     }
 }
@@ -1641,18 +1558,16 @@ main {
 @keyframes pulse-banner-btn {
     0% {
         transform: scale(1);
-        /* Sombra base do btn-primary */
         box-shadow: 0 3px 0px rgba(var(--rgb-primary-color), 0.4),
                     0 5px 8px rgba(var(--rgb-primary-color), 0.25),
                     0 5px 8px rgba(0, 0, 0, 0.1);
     }
     50% {
-        transform: scale(1.05); /* Aumenta levemente o tamanho */
-        /* Sombras um pouco mais intensas ou espalhadas para efeito de "glow" */
+        transform: scale(1.05);
         box-shadow: 0 4px 0px rgba(var(--rgb-primary-color), 0.5),
                     0 7px 12px rgba(var(--rgb-primary-color), 0.35),
                     0 7px 12px rgba(0, 0, 0, 0.15),
-                    0 0 15px rgba(var(--rgb-primary-color), 0.3); /* Adiciona um brilho sutil */
+                    0 0 15px rgba(var(--rgb-primary-color), 0.3);
     }
     100% {
         transform: scale(1);
