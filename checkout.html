@@ -212,20 +212,51 @@
         document.getElementById('chosenPlanText').textContent = chosenText;
 
         // 5) Adiciona o evento de clique ao botão de pagamento
+      // <<< COLE O NOVO CÓDIGO AQUI >>>
+
+        // ==================================================================
+        // INÍCIO DA ALTERAÇÃO - LÓGICA DO BOTÃO DE PAGAMENTO ATUALIZADA
+        // ==================================================================
         document.getElementById('payButton').addEventListener('click', async function() {
+          const payButton = this; // Guarda a referência do botão
           const token = localStorage.getItem('authToken');
+
           if (!token) {
             alert('Você precisa estar logado para continuar o pagamento.');
-            // Idealmente, abrir o modal de login aqui
+            // Idealmente, abrir o modal de login aqui.
             return;
           }
 
-          this.textContent = 'Aguarde...';
-          this.disabled = true;
+          payButton.textContent = 'Verificando dados...';
+          payButton.disabled = true;
 
           try {
-            // Envia TODOS os dados necessários para o backend
-            const response = await fetch('/api/payment/create_preference', {
+            // ETAPA 1: Buscar os dados do usuário para verificar o endereço
+            const userResponse = await fetch('/api/users/me', {
+              headers: { 'Authorization': token }
+            });
+
+            if (!userResponse.ok) {
+              throw new Error('Não foi possível verificar seus dados. Tente fazer login novamente.');
+            }
+            
+            const userData = await userResponse.json();
+            const address = userData.address;
+
+            // ETAPA 2: Checar se o nome ou campos de endereço estão vazios
+            if (!userData.name || !address.street || !address.city || !address.state || !address.zipcode) {
+              alert('Por favor, complete seu nome e endereço na sua conta antes de continuar.');
+              // Redireciona para a página da conta.
+              // *** ATENÇÃO: Verifique se o nome do arquivo é 'minha-conta.html' ***
+              window.location.href = 'minha-conta.html';
+              return; // Para a execução aqui
+            }
+
+            // Se a verificação passou, continua para o pagamento
+            payButton.textContent = 'Aguarde...';
+            
+            // ETAPA 3: Criar a preferência de pagamento (lógica que já existia)
+            const paymentResponse = await fetch('/api/payment/create_preference', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -240,22 +271,25 @@
               })
             });
 
-            const data = await response.json();
+            const paymentData = await paymentResponse.json();
 
-            if (!response.ok) {
-              throw new Error(data.error || 'Não foi possível criar a preferência de pagamento.');
+            if (!paymentResponse.ok) {
+              throw new Error(paymentData.error || 'Não foi possível criar a preferência de pagamento.');
             }
 
-            // Redireciona o usuário para o checkout do Mercado Pago
-            window.location.href = data.checkoutUrl;
+            // ETAPA 4: Redirecionar para o Mercado Pago
+            window.location.href = paymentData.checkoutUrl;
 
           } catch (err) {
-            console.error(err);
-            alert('Houve um erro ao tentar iniciar o pagamento: ' + err.message);
-            this.textContent = 'Ir para pagamento';
-            this.disabled = false;
+            console.error('Erro no processo de checkout:', err);
+            alert('Houve um erro: ' + err.message);
+            payButton.textContent = 'Ir para pagamento';
+            payButton.disabled = false;
           }
         });
+        // ==================================================================
+        // FIM DA ALTERAÇÃO
+        // ==================================================================
       });
     </script>
     <!-- ===== Fim do Script específico do Checkout ===== -->
