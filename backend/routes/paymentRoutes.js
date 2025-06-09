@@ -136,13 +136,21 @@ router.get('/success', async (req, res) => {
     console.log(`[SUCCESS] Pedido encontrado para o usuário: ${order.userId}. Verificando se é uma assinatura...`);
 
     if (order.isSubscription) {
-      console.log('[SUCCESS] O pedido é uma assinatura. Processando...');
-      const hoje = new Date();
-      const duracao = parseInt(order.planType, 10);
+     const hoje = new Date();
       const dataProxima = new Date(hoje);
       dataProxima.setMonth(dataProxima.getMonth() + 1);
+
+      // CORREÇÃO: Pega a duração diretamente do pedido, que já está correta (ex: 6 ou 12)
+      const duracao = order.duration;
       const repsLeft = duracao > 1 ? (duracao - 1) : 0;
-      const planTypeString = order.planType === '1' ? 'one_time' : order.planType === '6' ? 'semiannual' : order.planType === '12' ? 'annual' : 'unknown';
+
+      // CORREÇÃO: Determina o nome do plano a partir do ID do plano (ex: "fl_semi_annual")
+      let planTypeString = 'Desconhecido';
+      if (order.planType.includes('annual')) {
+          planTypeString = 'Anual';
+      } else if (order.planType.includes('semi_annual')) {
+          planTypeString = 'Semestral';
+      }
 
       let subs = await Subscription.findOne({ userId: order.userId });
 
