@@ -128,32 +128,30 @@
     <script src="js/script.js"></script>
 
     <!-- ===== Script específico do Checkout ===== -->
-    <script>
+      <script>
       document.addEventListener('DOMContentLoaded', function() {
-     // 1) Lê os parâmetros da URL.
-// Primeiro tenta pegar 'planId' (para assinaturas) e, se não encontrar,
-// tenta pegar 'plan' (para a Mini K-BOXY).
-const params = new URLSearchParams(window.location.search);
-const planId = params.get('planId') || params.get('plan') || 'Não definido';
-const boxType = params.get('boxType') || null;
+        // 1) Lê os parâmetros da URL para identificar o plano e a box.
+        const params = new URLSearchParams(window.location.search);
+        const planId = params.get('planId') || params.get('plan') || 'Não definido';
+        const boxType = params.get('boxType') || null;
+        
+        // 2) Inicializa variáveis
         let displayText = '';
         let unitPrice = 0;
-        let duration = 1; // 1 = compra única; >1 = assinatura recorrente
+        let duration = 1;
 
-        // 3) Define displayText, unitPrice e duration conforme planId
+        // 3) Define os detalhes do plano com base no ID
         switch (planId) {
           case 'firstLove':
             displayText = 'K-BOXY First Love – Compra Única';
             unitPrice   = 69.90;
             duration    = 1;
             break;
-
-            case 'miniKBoxyPromo':
-  displayText = 'Mini K-BOXY – Compra Única';
-  unitPrice   = 30.00;
-  duration    = 1;    // compra única
-  break;
-  
+          case 'miniKBoxyPromo':
+            displayText = 'Mini K-BOXY – Compra Única';
+            unitPrice   = 30.00;
+            duration    = 1;
+            break;
           case 'fl_semi_annual':
             displayText = 'K-BOXY First Love – Plano Semestral';
             unitPrice   = 54.90;
@@ -200,57 +198,62 @@ const boxType = params.get('boxType') || null;
             duration    = 1;
         }
 
-        // 4) Monta o texto final que será exibido ao usuário
+        // 4) Atualiza o texto na tela
         let chosenText = '';
-        if (duration === 1) {
-          // Compra única
-          chosenText = `${displayText} – R$ ${unitPrice.toFixed(2)}`;
+        if (displayText !== 'Plano não definido') {
+            if (duration === 1) {
+                chosenText = `${displayText} – R$ ${unitPrice.toFixed(2)}`;
+            } else {
+                chosenText = `${displayText} – R$ ${unitPrice.toFixed(2)} por mês durante ${duration} meses`;
+            }
         } else {
-          // Assinatura recorrente
-          chosenText = `${displayText} – R$ ${unitPrice.toFixed(2)} por mês durante ${duration} meses`;
+            chosenText = 'Plano não selecionado. Por favor, volte e escolha uma box.';
         }
         document.getElementById('chosenPlanText').textContent = chosenText;
 
-        // 5) Quando o usuário clica em “Ir para pagamento”:
+        // 5) Adiciona o evento de clique ao botão de pagamento
         document.getElementById('payButton').addEventListener('click', async function() {
-          // 5.1) Verifica se o usuário está logado (token JWT no localStorage)
           const token = localStorage.getItem('authToken');
           if (!token) {
             alert('Você precisa estar logado para continuar o pagamento.');
-            window.location.href = '/minha-conta.html';
+            // Idealmente, abrir o modal de login aqui
             return;
           }
 
+          this.textContent = 'Aguarde...';
+          this.disabled = true;
+
           try {
-            // 5.2) Faz o POST para /api/payment/create_preference, enviando token
+            // Envia TODOS os dados necessários para o backend
             const response = await fetch('/api/payment/create_preference', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
                 'Authorization': token
               },
-             body: JSON.stringify({
-  boxType: boxType, // <-- LINHA ADICIONADA
-  planId: planId,
-  price: parseFloat(unitPrice.toFixed(2)),
-  title: displayText,
-  description: displayText,
-  duration: duration
-})
+              body: JSON.stringify({
+                boxType: boxType,
+                planId: planId,
+                price: parseFloat(unitPrice.toFixed(2)),
+                title: displayText,
+                duration: duration
+              })
+            });
 
-            // 5.3) Se o servidor não devolver 2xx, dispara erro
-            if (!response.ok) {
-              throw new Error('Não foi possível criar a preferência de pagamento.');
-            }
-
-            // 5.4) Recebe a resposta JSON com { checkoutUrl: "link-do-MP", orderId: "..." }
             const data = await response.json();
 
-            // 5.5) Redireciona o usuário para o Mercado Pago (checkoutUrl)
+            if (!response.ok) {
+              throw new Error(data.error || 'Não foi possível criar a preferência de pagamento.');
+            }
+
+            // Redireciona o usuário para o checkout do Mercado Pago
             window.location.href = data.checkoutUrl;
+
           } catch (err) {
             console.error(err);
-            alert('Houve um erro ao tentar iniciar o pagamento. Tente novamente mais tarde.');
+            alert('Houve um erro ao tentar iniciar o pagamento: ' + err.message);
+            this.textContent = 'Ir para pagamento';
+            this.disabled = false;
           }
         });
       });
