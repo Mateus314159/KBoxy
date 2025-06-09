@@ -319,14 +319,18 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.json().then(data => ({ status: response.status, body: data })))
         .then(({ status, body }) => {
-            if (status === 200 && body.token) {
-                localStorage.setItem('authToken', body.token);
-                localStorage.setItem('userId', body.userId);
-                if (body.avatarUrl) localStorage.setItem('userAvatarUrl', body.avatarUrl);
-                alert('Login realizado com sucesso!');
-                closeLoginModal();
-                updateUIAfterLogin();
-            } else {
+         if (status === 200 && body.token) {
+    localStorage.setItem('authToken', body.token);
+    localStorage.setItem('userId', body.userId);
+
+    // CORRIGIDO: Salva a URL do avatar que veio do servidor. Se não vier nenhuma,
+    // salva uma string vazia. Isso limpa qualquer valor antigo que estivesse salvo.
+    localStorage.setItem('userAvatarUrl', body.avatarUrl || '');
+    
+    alert('Login realizado com sucesso!');
+    closeLoginModal();
+    updateUIAfterLogin();
+} else {
                 alert(body.message || 'Erro ao fazer login.');
             }
         }).catch(error => { console.error('Erro na requisição de login:', error); alert('Ocorreu um erro ao tentar fazer login.'); });
@@ -598,9 +602,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    function handleBackToTopButton() {
-        if (backToTopBtn) { window.scrollY > 300 ? backToTopBtn.classList.add('show') : backToToTopBtn.classList.remove('show'); }
+   function handleBackToTopButton() {
+    // CORRIGIDO: Removido o erro de digitação 'backToToTopBtn'
+    if (backToTopBtn) {
+        window.scrollY > 300 ? backToTopBtn.classList.add('show') : backToTopBtn.classList.remove('show');
     }
+}
     
     backToTopBtn?.addEventListener('click', (e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
 
