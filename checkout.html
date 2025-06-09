@@ -130,12 +130,12 @@
     <!-- ===== Script específico do Checkout ===== -->
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-       // 1) Lê os parâmetros da URL.
+     // 1) Lê os parâmetros da URL.
 // Primeiro tenta pegar 'planId' (para assinaturas) e, se não encontrar,
 // tenta pegar 'plan' (para a Mini K-BOXY).
 const params = new URLSearchParams(window.location.search);
 const planId = params.get('planId') || params.get('plan') || 'Não definido';
-        // 2) Inicializa variáveis de texto, preço e duração
+const boxType = params.get('boxType') || null;
         let displayText = '';
         let unitPrice = 0;
         let duration = 1; // 1 = compra única; >1 = assinatura recorrente
@@ -229,14 +229,14 @@ const planId = params.get('planId') || params.get('plan') || 'Não definido';
                 'Content-Type': 'application/json',
                 'Authorization': token
               },
-              body: JSON.stringify({
-                planId: planId,
-                price: parseFloat(unitPrice.toFixed(2)),
-                title: displayText,
-                description: displayText,
-                duration: duration
-              })
-            });
+             body: JSON.stringify({
+  boxType: boxType, // <-- LINHA ADICIONADA
+  planId: planId,
+  price: parseFloat(unitPrice.toFixed(2)),
+  title: displayText,
+  description: displayText,
+  duration: duration
+})
 
             // 5.3) Se o servidor não devolver 2xx, dispara erro
             if (!response.ok) {
