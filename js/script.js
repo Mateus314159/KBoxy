@@ -431,18 +431,29 @@ document.addEventListener('DOMContentLoaded', function() {
     // ***** FIM DA CORREÇÃO PRINCIPAL *****
     // =============================================================
 
-    document.querySelectorAll('.box-card .btn-ver-mais').forEach(button => {
-        button.addEventListener('click', function() {
-            const boxCard = this.closest('.box-card');
-            if (boxCard) {
-                const boxId = boxCard.dataset.boxid;
-                // Exceção para o botão da Mini K-BOXY que já tem um onclick para o checkout
-                if (boxId && boxId !== 'miniKBoxyPromo') {
-                    openSubscriptionPlansModal(boxId);
-                }
-            }
-        });
-    });
+  // ******************************************************
+// Handler unificado: login + redirecionamento para checkout
+// ******************************************************
+document.querySelectorAll('.box-card .btn-ver-mais').forEach(button => {
+  button.addEventListener('click', function() {
+    // 1) Se não estiver logado:
+    if (!localStorage.getItem('authToken')) {
+      alert('Por favor, faça login para assinar.');
+      openLoginModal();
+      return;
+    }
+
+    // 2) Se estiver logado, pega o boxId e manda para checkout
+    const boxCard = this.closest('.box-card');
+    if (boxCard) {
+      const boxId = boxCard.dataset.boxid;
+      if (boxId) {
+        window.location.href = `checkout.html?plan=${boxId}`;
+      }
+    }
+  });
+});
+
 
     closeSubscriptionPlansModalBtn?.addEventListener('click', closeSubscriptionPlansModal);
     closeBoxDetailsModalBtn?.addEventListener('click', closeBoxDetailsModal);
