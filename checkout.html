@@ -130,10 +130,11 @@
     <!-- ===== Script específico do Checkout ===== -->
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-        // 1) Lê o parâmetro ?plan=… da URL
-        const params = new URLSearchParams(window.location.search);
-        const planId = params.get('plan') || 'Não definido';
-
+       // 1) Lê os parâmetros da URL.
+// Primeiro tenta pegar 'planId' (para assinaturas) e, se não encontrar,
+// tenta pegar 'plan' (para a Mini K-BOXY).
+const params = new URLSearchParams(window.location.search);
+const planId = params.get('planId') || params.get('plan') || 'Não definido';
         // 2) Inicializa variáveis de texto, preço e duração
         let displayText = '';
         let unitPrice = 0;
