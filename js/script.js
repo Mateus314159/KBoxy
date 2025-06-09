@@ -407,18 +407,35 @@ document.addEventListener('DOMContentLoaded', function() {
     // ***** FIM DA CORREÇÃO PRINCIPAL *****
     // =============================================================
 
-    document.querySelectorAll('.box-card .btn-ver-mais').forEach(button => {
-        button.addEventListener('click', function() {
-            const boxCard = this.closest('.box-card');
-            if (boxCard) {
-                const boxId = boxCard.dataset.boxid;
-                // Exceção para o botão da Mini K-BOXY que já tem um onclick para o checkout
-                if (boxId && boxId !== 'miniKBoxyPromo') {
-                    openSubscriptionPlansModal(boxId);
-                }
+   document.querySelectorAll('.box-card .btn-ver-mais').forEach(button => {
+    button.addEventListener('click', function() {
+        const boxCard = this.closest('.box-card');
+        if (!boxCard) return;
+
+        const boxId = boxCard.dataset.boxid;
+        if (!boxId) return;
+
+        // --- INÍCIO DA NOVA LÓGICA ---
+
+        // Se o botão clicado for o da Mini K-BOXY
+        if (boxId === 'miniKBoxyPromo') {
+            const token = localStorage.getItem('authToken');
+
+            if (token) {
+                // 1. Se o usuário estiver LOGADO, redireciona para o checkout.
+                window.location.href = 'checkout.html?plan=miniKBoxyPromo';
+            } else {
+                // 2. Se o usuário estiver DESLOGADO, avisa e abre o modal de login.
+                alert('Você precisa fazer login para comprar este item.');
+                openLoginModal();
             }
-        });
+        } else {
+            // Lógica para todas as outras boxes (continua funcionando como antes).
+            openSubscriptionPlansModal(boxId);
+        }
+        // --- FIM DA NOVA LÓGICA ---
     });
+});
 
     closeSubscriptionPlansModalBtn?.addEventListener('click', closeSubscriptionPlansModal);
     closeBoxDetailsModalBtn?.addEventListener('click', closeBoxDetailsModal);
