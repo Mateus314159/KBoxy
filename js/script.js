@@ -380,80 +380,41 @@ document.addEventListener('DOMContentLoaded', function() {
     switchToRegisterBtnFromLogin?.addEventListener('click', function(e) { e.preventDefault(); closeLoginModal(); openRegisterModal(); });
     switchToLoginBtnFromRegister?.addEventListener('click', function(e) { e.preventDefault(); closeRegisterModal(); openLoginModal(); });
 
-    // =============================================================
+  // =============================================================
     // ***** INÍCIO DA CORREÇÃO PRINCIPAL *****
     // =============================================================
-    async function createOrder(boxType, planIdForBackend) {
+    function createOrder(boxType, planIdForBackend) {
         const token = localStorage.getItem('authToken');
+
+        // 1. Verifica se o usuário está logado
         if (!token) {
-            alert('Você precisa estar logado para iniciar uma compra.');
+            // Se não estiver logado, exibe um alerta e abre o modal de login.
+            alert('Você precisa estar logado para selecionar um plano.');
             openLoginModal();
-            return;
-             window.location.href = `checkout.html?boxType=${boxType}&planId=${planIdForBackend}`;
-    return;
+            return; // Interrompe a função aqui.
         }
 
-        // Feedback visual para o usuário
-        alert('Iniciando o processo de pagamento, por favor aguarde...');
-
-        try {
-            // 1. Chamar a rota POST /api/orders/ no back-end
-            const response = await fetch('/api/orders/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': token
-                },
-                body: JSON.stringify({
-                    boxType: boxType,
-                    planType: planIdForBackend
-                })
-            });
-
-            const data = await response.json();
-
-            // 2. Verificar se a resposta do back-end foi bem-sucedida
-            if (response.ok) {
-                // 3. Se sim, usar a URL do Mercado Pago (init_point) para redirecionar
-                console.log('Preferência de pagamento criada. Redirecionando para o Mercado Pago...');
-                window.location.href = data.init_point;
-            } else {
-                // 4. Se não, mostrar o erro retornado pelo back-end
-                console.error('Erro retornado pelo servidor:', data.error);
-                alert(`Ocorreu um erro: ${data.error}`);
-            }
-
-        } catch (err) {
-            // 5. Capturar erros de rede ou falhas de comunicação
-            console.error('Erro crítico ao tentar chamar a API de criação de ordem:', err);
-            alert('Não foi possível se comunicar com nossos servidores. Verifique sua conexão e tente novamente.');
-        }
+        // 2. Se o usuário estiver logado, redireciona para a página de checkout
+        // A função passa o tipo da box e o ID do plano como parâmetros na URL.
+        console.log(`Usuário logado. Redirecionando para checkout com Box: ${boxType}, Plano: ${planIdForBackend}`);
+        window.location.href = `checkout.html?boxType=${boxType}&planId=${planIdForBackend}`;
     }
     // =============================================================
     // ***** FIM DA CORREÇÃO PRINCIPAL *****
     // =============================================================
 
-  document.querySelectorAll('.box-card .btn-ver-mais').forEach(button => {
-    button.addEventListener('click', function() {
-        const boxCard = this.closest('.box-card');
-        if (!boxCard) return;
-        const boxId = boxCard.dataset.boxid;
-
-        if (boxId === 'miniKBoxyPromo') {
-            // Mini K-BOXY: exige login e, se logado, vai direto ao checkout
-            if (!localStorage.getItem('authToken')) {
-                alert('Por favor, faça login para assinar a Mini K-BOXY.');
-                openLoginModal();
-               return;
+    document.querySelectorAll('.box-card .btn-ver-mais').forEach(button => {
+        button.addEventListener('click', function() {
+            const boxCard = this.closest('.box-card');
+            if (boxCard) {
+                const boxId = boxCard.dataset.boxid;
+                // Exceção para o botão da Mini K-BOXY que já tem um onclick para o checkout
+                if (boxId && boxId !== 'miniKBoxyPromo') {
+                    openSubscriptionPlansModal(boxId);
+                }
             }
-            // Usuário logado → checkout imediato
-            window.location.href = `checkout.html?boxType=${boxId}&planId=${boxId}`;
-        } else {
-            // Caixas regulares continuam abrindo o modal de planos
-            openSubscriptionPlansModal(boxId);
-        }
+        });
     });
-});
 
     closeSubscriptionPlansModalBtn?.addEventListener('click', closeSubscriptionPlansModal);
     closeBoxDetailsModalBtn?.addEventListener('click', closeBoxDetailsModal);
