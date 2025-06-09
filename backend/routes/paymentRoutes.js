@@ -13,6 +13,21 @@ const Subscription  = require('../models/Subscription');
 // Função auxiliar para criar uma pausa (delay)
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+// Mapeamento de planos
+const PLANOS = {
+  firstLove: { nome: 'K-BOXY First Love (Compra Única)', valor: 69.90, duracao: 'Única' },
+  fl_semi_annual: { nome: 'K-BOXY First Love (Assinatura Semestral)', valor: 54.90, duracao: '6 meses' },
+  fl_annual: { nome: 'K-BOXY First Love (Assinatura Anual)', valor: 49.90, duracao: '12 meses' },
+  idolBox: { nome: 'K-BOXY Lover (Compra Única)', valor: 79.90, duracao: 'Única' },
+  il_semi_annual: { nome: 'K-BOXY Lover (Assinatura Semestral)', valor: 64.90, duracao: '6 meses' },
+  il_annual: { nome: 'K-BOXY Lover (Assinatura Anual)', valor: 59.90, duracao: '12 meses' },
+  legendBox: { nome: 'K-BOXY True Love (Compra Única)', valor: 99.90, duracao: 'Única' },
+  tl_semi_annual: { nome: 'K-BOXY True Love (Assinatura Semestral)', valor: 84.90, duracao: '6 meses' },
+  tl_annual: { nome: 'K-BOXY True Love (Assinatura Anual)', valor: 79.90, duracao: '12 meses' },
+  miniKBoxyPromo: { nome: 'Mini K-BOXY – Compra Única', valor: 30.00, duracao: 'Única' }
+};
+
+
 /// Rota CORRIGIDA para criar preferência E SALVAR o pedido
 router.post('/create_preference', auth, async (req, res) => { // <-- Adicionamos 'auth'
   try {
