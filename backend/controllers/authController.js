@@ -2,10 +2,24 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { sendMail } = require('../utils/mailer');
 
 exports.register = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+      // ─────────── Envia e-mail de boas-vindas ───────────
+  await sendMail({
+    to: newUser.email,
+    subject: '🎉 Bem-vindo ao K-Boxy!',
+    html: `
+      <h1>Olá!</h1>
+      <p>Seu cadastro foi realizado com sucesso. Bem-vindo ao K-Boxy!</p>
+      <p>Acesse: <a href="${process.env.FRONTEND_URL}">www.kboxy.com.br</a></p>
+    `
+  });
+  // ───────────────────────────────────────────────────
+
 
     const exists = await User.findOne({ email });
     if (exists) return res.status(400).json({ message: 'Email já cadastrado.' });
