@@ -16,6 +16,12 @@ app.use('/api', freteRoutes);
 // 1. SERVIR ARQUIVOS ESTÁTICOS DO FRONTEND (index.html, checkout.html, CSS, JS, imagens, etc.)
 app.use(express.static(path.join(__dirname, '..')));
 
+// ─── Servir página de redefinição de senha ───
+app.get('/reset-password', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'reset-password.html'));
+});
+// ────────────────────────────────────────────
+
 // 2. SERVIR UPLOADS (AVATARES, IMAGENS, ETC.), se existir pasta de uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -50,6 +56,11 @@ app.use('/purchase', purchaseRoutes);
 
 // 5.3. MONTAR A ROTA DE ASSINATURAS
 app.use('/api/subscription', subscriptionRoutes);
+
+// NOVA ROTA PARA A PÁGINA DE REDEFINIÇÃO DE SENHA
+app.get('/reset-password', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'reset-password.html'));
+});
 
 // 6. INICIAR O SERVIDOR
 const PORT = process.env.PORT || 5000;
