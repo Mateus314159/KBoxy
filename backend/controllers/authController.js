@@ -8,7 +8,15 @@ exports.register = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-      // ─────────── Envia e-mail de boas-vindas ───────────
+ 
+
+    const exists = await User.findOne({ email });
+    if (exists) return res.status(400).json({ message: 'Email já cadastrado.' });
+
+    const hashed = await bcrypt.hash(password, 10);
+    const newUser = await User.create({ email, password: hashed });
+
+         // ─────────── Envia e-mail de boas-vindas ───────────
   await sendMail({
     to: newUser.email,
     subject: '🎉 Bem-vindo ao K-Boxy!',
@@ -20,12 +28,6 @@ exports.register = async (req, res) => {
   });
   // ───────────────────────────────────────────────────
 
-
-    const exists = await User.findOne({ email });
-    if (exists) return res.status(400).json({ message: 'Email já cadastrado.' });
-
-    const hashed = await bcrypt.hash(password, 10);
-    const newUser = await User.create({ email, password: hashed });
 
     res.status(201).json({ message: 'Usuário criado com sucesso.' });
   } catch (err) {
