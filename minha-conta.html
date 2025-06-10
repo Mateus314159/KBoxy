@@ -3,14 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minha Conta - K-boxy</title>
+    <title>Checkout – K-boxy</title>
+    <meta name="description" content="Finalize sua compra na K-boxy e receba sua box misteriosa de K-pop!">
+
+    <!-- Ícone da aba -->
     <link rel="icon" type="image/png" href="images/logo.png">
+
+    <!-- CSS principal e fontes -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/minha-conta.css">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Fredoka+One&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Fredoka+One&display=swap"
+      rel="stylesheet"
+    >
 </head>
 <body>
+
+    <!-- Preloader (igual ao index.html) -->
+    <div class="preloader">
+        <img src="images/logo-k-boxy-anim.svg" alt="K-boxy Logo Animado" class="preloader-logo">
+    </div>
+
+    <!-- Modal de CEP -->
+    <div id="cepModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;">
+      <div class="modal-content" style="background:#fff; padding:20px; border-radius:8px; max-width:400px; width:90%; text-align:center;">
+        <span id="closeCepModal" style="cursor:pointer; float:right; font-size:1.2rem;">&times;</span>
+        <h2>Calcular Frete</h2>
+        <input type="text" id="inputCep" placeholder="CEP (somente números)" style="width:100%; padding:8px; margin:10px 0;">
+        <button id="btnCalcFrete" class="btn btn-primary">Calcular</button>
+        <p id="freteResult" style="margin-top:10px;"></p>
+        <button id="btnConfirmFrete" class="btn btn-primary" disabled>Confirmar Frete</button>
+      </div>
+    </div>
+
+    <!-- Header idêntico ao index.html -->
     <header class="header">
         <div class="container">
             <a href="index.html#home" class="logo">
@@ -25,12 +56,14 @@
                 </ul>
             </nav>
             <div class="header-actions">
-                <button class="btn btn-primary" onclick="window.location.href='index.html#boxes'">Compre Agora</button>
+                <button class="btn btn-primary" onclick="scrollToSection('#boxes')">Compre Agora</button>
                 <div class="user-action-container">
                     <button id="login-action-button" class="header-icon-btn" aria-label="Menu do usuário">
                         <i class="fas fa-user-circle"></i>
                     </button>
                     <div id="user-dropdown" class="user-dropdown-menu">
+                        <a href="#" id="dropdown-login-link">Login</a>
+                        <a href="#" id="dropdown-register-link">Cadastrar</a>
                     </div>
                 </div>
                 <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menu">
@@ -40,154 +73,34 @@
         </div>
     </header>
 
-    <main class="account-page-main-content">
-        <div class="container account-layout">
-            <aside class="account-sidebar">
-                <div class="account-profile-summary">
-                    <div class="profile-picture-container">
-                        <img id="user-avatar-img" src="https://placehold.co/100x100/f8bbd0/1A1A1A?text=K&font=Poppins" alt="Foto do Perfil" class="user-avatar">
-                        <label for="avatar-upload-input" class="edit-avatar-btn" title="Alterar foto">
-                            <i class="fas fa-camera"></i>
-                        </label>
-                        <input type="file" id="avatar-upload-input" accept="image/*" style="display:none;">
-                    </div>
-                    <h3 id="user-account-name">Nome do Usuário</h3>
-                    <p id="user-account-email">email@kpopper.com</p>
-                </div>
-                <nav class="account-navigation">
-                    <ul>
-                        <li><a href="#perfil" data-section="perfil" class="active-account-tab"><i class="fas fa-user-cog"></i> Meu Perfil</a></li>
-                        <li><a href="#assinatura" data-section="assinatura"><i class="fas fa-star"></i> Sua Assinatura</a></li>
-                        <li><a href="#pedidos" data-section="pedidos"><i class="fas fa-receipt"></i> Meus Pedidos</a></li>
-                        <li><a href="#enderecos" data-section="enderecos"><i class="fas fa-map-marker-alt"></i> Endereços</a></li>
-                        <li><a href="#seguranca" data-section="seguranca"><i class="fas fa-shield-alt"></i> Segurança</a></li>
-                        <li><a href="#" id="account-page-logout"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
-                    </ul>
-                </nav>
-            </aside>
-
-            <section class="account-main-section">
-                <div id="perfil" class="account-tab-content active-content">
-                    <h2>Meu Perfil</h2>
-                    <form id="profile-update-form">
-                        <div class="form-group">
-                            <label for="profile-input-name">Nome:</label>
-                            <input type="text" id="profile-input-name" placeholder="Como quer ser chamado?" autocomplete="name">
-                        </div>
-                        <div class="form-group">
-                            <label for="profile-input-email">Email:</label>
-                            <input type="email" id="profile-input-email" readonly disabled autocomplete="email">
-                        </div>
-                        <h3>Seu Endereço Principal</h3>
-                        <div class="form-group">
-                            <label for="profile-input-street">Endereço (Rua, Número):</label>
-                            <input type="text" id="profile-input-street" name="street" placeholder="Ex: Rua das Flores, 123" autocomplete="street-address">
-                        </div>
-                        <div class="form-group">
-                            <label for="profile-input-complement">Complemento (Apto, Bloco, etc.):</label>
-                            <input type="text" id="profile-input-complement" name="complement" placeholder="Ex: Apto 101, Bloco A" autocomplete="address-line2">
-                        </div>
-                        <div class="form-group">
-                            <label for="profile-input-neighborhood">Bairro:</label>
-                            <input type="text" id="profile-input-neighborhood" name="neighborhood" placeholder="Ex: Jardim K-Pop" autocomplete="address-level3">
-                        </div>
-                        <div class="form-group">
-                            <label for="profile-input-city">Cidade:</label>
-                            <input type="text" id="profile-input-city" name="city" placeholder="Ex: Seul" autocomplete="address-level2">
-                        </div>
-                        <div class="form-group">
-                            <label for="profile-input-state">Estado (UF):</label>
-                            <input type="text" id="profile-input-state" name="state" placeholder="Ex: SP" maxlength="2" autocomplete="address-level1">
-                        </div>
-                        <div class="form-group">
-                            <label for="profile-input-zipcode">CEP:</label>
-                            <input type="text" id="profile-input-zipcode" name="zipcode" placeholder="Ex: 01000-000" pattern="\d{5}-?\d{3}" autocomplete="postal-code">
-                        </div>
-                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-                    </form>
-                    <p class="avatar-note">Para alterar sua foto, clique no ícone de câmera sobre a imagem ao lado.</p>
-                </div>
-
-                <div id="assinatura" class="account-tab-content">
-                    <h2>Sua Assinatura K-boxy</h2>
-                    
-                    <div id="subscription-info-loading" style="display:none; padding: 20px;">
-                        <p>Carregando sua assinatura...</p>
-                    </div>
-
-                    <div id="active-subscription-details">
-                        </div>
-
-                    <div id="no-active-subscription" style="display:none;">
-                        <h3>Você ainda não é um assinante K-boxy! ✨</h3>
-                        <p>Imagine a emoção de receber uma caixa surpresa cheia de itens incríveis do seu universo K-Pop favorito, entregue na sua porta todos os meses! Com a K-boxy, cada caixa é uma nova aventura.</p>
-                        <img src="images/FLcapa1.png" alt="Exemplo de K-Boxy" style="max-width:250px; border-radius:10px; margin:15px auto; display:block;">
-                        <p><strong>Nossos assinantes desfrutam de:</strong></p>
-                        <ul>
-                            <li><i class="fas fa-gift"></i> Itens exclusivos e personalizados.</li>
-                            <li><i class="fas fa-tags"></i> Preços especiais em planos de longa duração.</li>
-                            <li><i class="fas fa-heart"></i> A alegria de ser surpreendido e fazer parte de uma comunidade apaixonada!</li>
-                        </ul>
-                        <button class="btn btn-primary btn-large" onclick="window.location.href='index.html#boxes'">Quero Assinar Agora!</button>
-                    </div>
-                </div>
-
-                <div id="pedidos" class="account-tab-content">
-                    <h2>Meus Pedidos</h2>
-                    <div id="orders-list-container">
-                    </div>
-                    <div id="no-orders-message" style="display:none;"><p>Você ainda não fez nenhum pedido. Que tal começar pela sua primeira K-Boxy?</p></div>
-                </div>
-
-                <div id="enderecos" class="account-tab-content">
-                    <h2>Meus Endereços</h2>
-
-                    <div id="address-display-loading" style="display:none; padding: 15px;">
-                        Carregando seu endereço...
-                    </div>
-
-                    <div id="address-display-area">
-                        <div id="address-card" class="address-card" style="display:none;">
-                            <p><strong>Endereço:</strong> <span id="addr-street"></span></p>
-                            <p><strong>Complemento:</strong> <span id="addr-complement"></span></p>
-                            <p><strong>Bairro:</strong> <span id="addr-neighborhood"></span></p>
-                            <p><strong>Cidade / Estado:</strong> <span id="addr-citystate"></span></p>
-                            <p><strong>CEP:</strong> <span id="addr-zipcode"></span></p>
-                        </div>
-                    </div>
-
-                    <div id="no-address-saved-message" style="display:none; padding: 15px;">
-                        <p>Você ainda não cadastrou um endereço.</p>
-                        <p>Por favor, preencha seu endereço na aba 
-                           <a href="#" class="account-nav-link-inline" data-section="perfil">Meu Perfil</a>.
-                        </p>
-                    </div>
-                </div>
-
-                <div id="seguranca" class="account-tab-content"> 
-                    <h2>Segurança</h2>
-                    <form id="change-password-form-account">
-                        <h3>Alterar Senha</h3>
-                        <div class="form-group">
-                            <label for="current-password-page">Senha Atual:</label>
-                            <input type="password" id="current-password-page" required autocomplete="current-password">
-                        </div>
-                        <div class="form-group">
-                            <label for="new-password-page">Nova Senha:</label>
-                            <input type="password" id="new-password-page" required minlength="6" autocomplete="new-password">
-                        </div>
-                        <div class="form-group">
-                            <label for="confirm-new-password-page">Confirmar Nova Senha:</label>
-                            <input type="password" id="confirm-new-password-page" required autocomplete="new-password">
-                        </div>
-                        <button type="submit" class="btn btn-primary">Salvar Nova Senha</button>
-                    </form>
-                </div>
-
-            </section>
+    <!-- Main do Checkout -->
+    <main class="section-padding" style="padding-top: calc(var(--header-height) + 40px);">
+        <div class="container" data-aos="fade-up">
+            <h1 class="section-title" style="margin-bottom: 30px;">Checkout</h1>
+            <div class="checkout-card"
+                 style="background-color: var(--card-bg-color);
+                        border-radius: 12px;
+                        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                        padding: 30px;
+                        max-width: 600px;
+                        margin: 0 auto;
+                        text-align: center;">
+                <!-- Aqui será exibido o texto do plano (ex.: "K-BOXY First Love – R$ 69,90") -->
+                <p id="chosenPlanText"
+                   style="font-size: 1.2rem;
+                          margin-bottom: 25px;
+                          color: var(--dark-color);">
+                    Carregando informações do plano…
+                </p>
+                <!-- Botão que dispara o fetch para criar preferência ou assinatura -->
+                <button id="payButton" class="btn btn-primary btn-large">
+                    Ir para pagamento
+                </button>
+            </div>
         </div>
     </main>
 
+    <!-- Footer idêntico ao index.html -->
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
@@ -199,24 +112,234 @@
                 <div class="footer-links">
                     <h4>Links Rápidos</h4>
                     <ul>
-                        <li><a href="index.html#sobre">Sobre Nós</a></li>
-                        <li><a href="index.html#boxes">Nossas Boxes</a></li>
+                        <li><a href="#sobre">Sobre Nós</a></li>
+                        <li><a href="#boxes">Nossas Boxes</a></li>
                         <li><a href="#">FAQ</a></li>
                         <li><a href="#">Política de Privacidade</a></li>
                     </ul>
                 </div>
-               <div class="footer-social">
-    <h4>Siga-nos</h4>
-    <a href="https://www.instagram.com/kboxy2025?igsh=bHgzODYxc2dvc3U4" target="_blank" aria-label="Instagram K-boxy"><i class="fab fa-instagram"></i></a>
-    <a href="#" target="_blank" aria-label="TikTok K-boxy"><i class="fab fa-tiktok"></i></a>
-    <a href="https://www.facebook.com/share/19CHKG6iLG/" target="_blank" aria-label="Facebook K-boxy"><i class="fab fa-facebook"></i></a>
-    <a href="#" target="_blank" aria-label="Twitter K-boxy"><i class="fab fa-twitter"></i></a>
-</div>
+              <div class="footer-social">
+        <h4>Siga-nos</h4>
+        <a href="https://www.instagram.com/kboxy2025?igsh=bHgzODYxc2dvc3U4" target="_blank" aria-label="Instagram K-boxy"><i class="fab fa-instagram"></i></a>
+        <a href="#" target="_blank" aria-label="TikTok K-boxy"><i class="fab fa-tiktok"></i></a>
+        <a href="https://www.facebook.com/share/19CHKG6iLG/" target="_blank" aria-label="Facebook K-boxy"><i class="fab fa-facebook"></i></a>
+        <a href="#" target="_blank" aria-label="Twitter K-boxy"><i class="fab fa-twitter"></i></a>
+    </div>
             </div>
         </div>
     </footer>
 
+    <!-- Back to top -->
+    <button id="back-to-top" class="back-to-top-btn" title="Voltar ao topo">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- ===== Scripts gerais (AOS, Swiper, script.js original) ===== -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <script src="js/script.js"></script>
-    <script src="js/minha-conta.js"></script>
+
+    <!-- ===== Script específico do Checkout ===== -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // 1) Lê os parâmetros da URL para identificar o plano e a box.
+        const params = new URLSearchParams(window.location.search);
+        const planId = params.get('planId') || params.get('plan') || 'Não definido';
+        const boxType = params.get('boxType') || null;
+        
+        // 2) Inicializa variáveis
+        let displayText = '';
+        let unitPrice = 0;
+        let duration = 1;
+
+        // 3) Define os detalhes do plano com base no ID
+        switch (planId) {
+          case 'firstLove':
+            displayText = 'K-BOXY First Love – Compra Única';
+            unitPrice   = 69.90;
+            duration    = 1;
+            break;
+          case 'miniKBoxyPromo':
+            displayText = 'Mini K-BOXY – Compra Única';
+            unitPrice   = 30.00;
+            duration    = 1;
+            break;
+          case 'fl_semi_annual':
+            displayText = 'K-BOXY First Love – Plano Semestral';
+            unitPrice   = 54.90;
+            duration    = 6;
+            break;
+          case 'fl_annual':
+            displayText = 'K-BOXY First Love – Plano Anual';
+            unitPrice   = 49.90;
+            duration    = 12;
+            break;
+          case 'idolBox':
+            displayText = 'K-BOXY Lover – Compra Única';
+            unitPrice   = 79.90;
+            duration    = 1;
+            break;
+          case 'il_semi_annual':
+            displayText = 'K-BOXY Lover – Plano Semestral';
+            unitPrice   = 64.90;
+            duration    = 6;
+            break;
+          case 'il_annual':
+            displayText = 'K-BOXY Lover – Plano Anual';
+            unitPrice   = 59.90;
+            duration    = 12;
+            break;
+          case 'legendBox':
+            displayText = 'K-BOXY True Love – Compra Única';
+            unitPrice   = 99.90;
+            duration    = 1;
+            break;
+          case 'tl_semi_annual':
+            displayText = 'K-BOXY True Love – Plano Semestral';
+            unitPrice   = 84.90;
+            duration    = 6;
+            break;
+          case 'tl_annual':
+            displayText = 'K-BOXY True Love – Plano Anual';
+            unitPrice   = 79.90;
+            duration    = 12;
+            break;
+          default:
+            displayText = 'Plano não definido';
+            unitPrice   = 0.00;
+            duration    = 1;
+        }
+
+        // 4) Atualiza o texto na tela
+        let chosenText = '';
+        if (displayText !== 'Plano não definido') {
+            if (duration === 1) {
+                chosenText = `${displayText} – R$ ${unitPrice.toFixed(2)}`;
+            } else {
+                chosenText = `${displayText} – R$ ${unitPrice.toFixed(2)} por mês durante ${duration} meses`;
+            }
+        } else {
+            chosenText = 'Plano não selecionado. Por favor, volte e escolha uma box.';
+        }
+        document.getElementById('chosenPlanText').textContent = chosenText;
+
+        // 5) Configura modal e frete
+        const cepModal      = document.getElementById('cepModal');
+        const closeCepModal = document.getElementById('closeCepModal');
+        const btnCalcFrete  = document.getElementById('btnCalcFrete');
+        const btnConfirmFrete = document.getElementById('btnConfirmFrete');
+        const freteResult   = document.getElementById('freteResult');
+        let valorFrete      = 0;
+
+        // 5.0) Abre o modal assim que o checkout carrega
+        cepModal.style.display = 'flex';
+
+        // 5.1) Fechar modal
+        closeCepModal.addEventListener('click', () => {
+          cepModal.style.display = 'none';
+        });
+
+        // 5.2) Calcular frete
+        btnCalcFrete.addEventListener('click', async () => {
+          const cep = document.getElementById('inputCep').value.replace(/\D/g, '');
+          const res = await fetch('/api/frete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cep })
+          });
+          const data = await res.json();
+          if (data.frete != null) {
+            valorFrete = data.frete;
+            freteResult.textContent = `Frete: R$ ${valorFrete.toFixed(2)}`;
+            btnConfirmFrete.disabled = false;
+          } else {
+            freteResult.textContent = 'Erro ao calcular frete.';
+          }
+        });
+
+        // 5.3) Confirmar frete e atualizar total
+        btnConfirmFrete.addEventListener('click', () => {
+          if (duration === 1) {
+            document.getElementById('chosenPlanText').textContent =
+              `${displayText} – R$ ${(unitPrice + valorFrete).toFixed(2)}`;
+          } else {
+            document.getElementById('chosenPlanText').textContent =
+              `${displayText} – R$ ${(unitPrice + valorFrete).toFixed(2)} por mês durante ${duration} meses`;
+          }
+          cepModal.style.display = 'none';
+        });
+
+        // 6) Evento do botão de pagamento, agora incluindo frete
+        document.getElementById('payButton').addEventListener('click', async function() {
+          if (valorFrete === 0) {
+            cepModal.style.display = 'flex';
+            return;
+          }
+          const payButton = this;
+          const token = localStorage.getItem('authToken');
+
+          if (!token) {
+            alert('Você precisa estar logado para continuar o pagamento.');
+            return;
+          }
+
+          payButton.textContent = 'Verificando dados...';
+          payButton.disabled = true;
+
+          try {
+            // ETAPA 1: Verificar dados do usuário
+            const userResponse = await fetch('/api/users/me', {
+              headers: { 'Authorization': token }
+            });
+            if (!userResponse.ok) {
+              throw new Error('Não foi possível verificar seus dados. Tente fazer login novamente.');
+            }
+            const userData = await userResponse.json();
+            const address = userData.address;
+
+            // ETAPA 2: Checar endereço completo
+            if (!userData.name || !address.street || !address.city || !address.state || !address.zipcode) {
+              alert('Por favor, complete seu nome e endereço na sua conta antes de continuar.');
+              window.location.href = 'minha-conta.html';
+              return;
+            }
+
+            // ETAPA 3: Criar preferência de pagamento com frete incluso
+            payButton.textContent = 'Aguarde...';
+            const paymentResponse = await fetch('/api/payment/create_preference', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+              },
+              body: JSON.stringify({
+                boxType: boxType,
+                planId: planId,
+                price: parseFloat((unitPrice + valorFrete).toFixed(2)),
+                title: displayText,
+                duration: duration
+              })
+            });
+
+            const paymentData = await paymentResponse.json();
+            if (!paymentResponse.ok) {
+              throw new Error(paymentData.error || 'Não foi possível criar a preferência de pagamento.');
+            }
+
+            // ETAPA 4: Redirecionar para o Mercado Pago
+            window.location.href = paymentData.checkoutUrl;
+
+          } catch (err) {
+            console.error('Erro no processo de checkout:', err);
+            alert('Houve um erro: ' + err.message);
+            payButton.textContent = 'Ir para pagamento';
+            payButton.disabled = false;
+          }
+        });
+
+      });
+    </script>
+    <!-- ===== Fim do Script específico do Checkout ===== -->
+
 </body>
 </html>
