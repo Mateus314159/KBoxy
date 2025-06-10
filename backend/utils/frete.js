@@ -2,7 +2,7 @@
 const axios = require('axios');
 axios.defaults.timeout = 15000;  // até 15s de espera
 
-const { calcPrecoPrazo } = require('correios-brasil');  // <— aqui
+const correios     = require('correios-brasil');  // <— aqui
 
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
@@ -25,7 +25,7 @@ async function calcularFrete(cepDestino) {
 
   // função que chama de fato a API
   const attempt = async () => {
-    const resposta = await calcPrecoPrazo(params);
+    const resposta = await correios.calcPrecoPrazo(params);
     if (!Array.isArray(resposta) || !resposta[0] || !resposta[0].Valor) {
       throw new Error('Resposta inválida dos Correios: ' + JSON.stringify(resposta));
     }
