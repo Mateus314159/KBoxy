@@ -3,10 +3,15 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 const path = require('path');
+const express = require('express');
+
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+const freteRoutes = require('./routes/api/frete');
+app.use('/api', freteRoutes);
 
 // 1. SERVIR ARQUIVOS ESTÁTICOS DO FRONTEND (index.html, checkout.html, CSS, JS, imagens, etc.)
 app.use(express.static(path.join(__dirname, '..')));
