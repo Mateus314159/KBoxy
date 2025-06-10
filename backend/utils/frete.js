@@ -34,7 +34,7 @@ async function calcularFrete(cepDestino) {
     const timeoutPromise = new Promise((_, reject) => {
       setTimeout(() => {
         reject(new Error('A consulta aos Correios demorou muito para responder (timeout).'));
-      }, 10000); // 10 segundos
+      }, 20000); // 10 segundos
     });
 
     // Disputa entre a chamada da API e o nosso timeout
