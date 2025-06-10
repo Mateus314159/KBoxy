@@ -29,6 +29,18 @@
         <img src="images/logo-k-boxy-anim.svg" alt="K-boxy Logo Animado" class="preloader-logo">
     </div>
 
+    <!-- Modal de CEP -->
+    <div id="cepModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;">
+      <div class="modal-content" style="background:#fff; padding:20px; border-radius:8px; max-width:400px; width:90%; text-align:center;">
+        <span id="closeCepModal" style="cursor:pointer; float:right; font-size:1.2rem;">&times;</span>
+        <h2>Calcular Frete</h2>
+        <input type="text" id="inputCep" placeholder="CEP (somente números)" style="width:100%; padding:8px; margin:10px 0;">
+        <button id="btnCalcFrete" class="btn btn-primary">Calcular</button>
+        <p id="freteResult" style="margin-top:10px;"></p>
+        <button id="btnConfirmFrete" class="btn btn-primary" disabled>Confirmar Frete</button>
+      </div>
+    </div>
+
     <!-- Header idêntico ao index.html -->
     <header class="header">
         <div class="container">
@@ -128,7 +140,7 @@
     <script src="js/script.js"></script>
 
     <!-- ===== Script específico do Checkout ===== -->
-      <script>
+    <script>
       document.addEventListener('DOMContentLoaded', function() {
         // 1) Lê os parâmetros da URL para identificar o plano e a box.
         const params = new URLSearchParams(window.location.search);
@@ -211,19 +223,57 @@
         }
         document.getElementById('chosenPlanText').textContent = chosenText;
 
-        // 5) Adiciona o evento de clique ao botão de pagamento
-      // <<< COLE O NOVO CÓDIGO AQUI >>>
+        // 5) Configura modal e frete
+        const cepModal      = document.getElementById('cepModal');
+        const closeCepModal = document.getElementById('closeCepModal');
+        const btnCalcFrete  = document.getElementById('btnCalcFrete');
+        const btnConfirmFrete = document.getElementById('btnConfirmFrete');
+        const freteResult   = document.getElementById('freteResult');
+        let valorFrete      = 0;
 
-        // ==================================================================
-        // INÍCIO DA ALTERAÇÃO - LÓGICA DO BOTÃO DE PAGAMENTO ATUALIZADA
-        // ==================================================================
+        closeCepModal.addEventListener('click', () => {
+          cepModal.style.display = 'none';
+        });
+
+        btnCalcFrete.addEventListener('click', async () => {
+          const cep = document.getElementById('inputCep').value.replace(/\D/g, '');
+          const res = await fetch('/api/frete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cep })
+          });
+          const data = await res.json();
+          if (data.frete != null) {
+            valorFrete = data.frete;
+            freteResult.textContent = `Frete: R$ ${valorFrete.toFixed(2)}`;
+            btnConfirmFrete.disabled = false;
+          } else {
+            freteResult.textContent = 'Erro ao calcular frete.';
+          }
+        });
+
+        btnConfirmFrete.addEventListener('click', () => {
+          if (duration === 1) {
+            document.getElementById('chosenPlanText').textContent =
+              `${displayText} – R$ ${(unitPrice + valorFrete).toFixed(2)}`;
+          } else {
+            document.getElementById('chosenPlanText').textContent =
+              `${displayText} – R$ ${(unitPrice + valorFrete).toFixed(2)} por mês durante ${duration} meses`;
+          }
+          cepModal.style.display = 'none';
+        });
+
+        // 6) Evento do botão de pagamento, agora incluindo frete
         document.getElementById('payButton').addEventListener('click', async function() {
-          const payButton = this; // Guarda a referência do botão
+          if (valorFrete === 0) {
+            cepModal.style.display = 'flex';
+            return;
+          }
+          const payButton = this;
           const token = localStorage.getItem('authToken');
 
           if (!token) {
             alert('Você precisa estar logado para continuar o pagamento.');
-            // Idealmente, abrir o modal de login aqui.
             return;
           }
 
@@ -231,31 +281,25 @@
           payButton.disabled = true;
 
           try {
-            // ETAPA 1: Buscar os dados do usuário para verificar o endereço
+            // ETAPA 1: Verificar dados do usuário
             const userResponse = await fetch('/api/users/me', {
               headers: { 'Authorization': token }
             });
-
             if (!userResponse.ok) {
               throw new Error('Não foi possível verificar seus dados. Tente fazer login novamente.');
             }
-            
             const userData = await userResponse.json();
             const address = userData.address;
 
-            // ETAPA 2: Checar se o nome ou campos de endereço estão vazios
+            // ETAPA 2: Checar endereço completo
             if (!userData.name || !address.street || !address.city || !address.state || !address.zipcode) {
               alert('Por favor, complete seu nome e endereço na sua conta antes de continuar.');
-              // Redireciona para a página da conta.
-              // *** ATENÇÃO: Verifique se o nome do arquivo é 'minha-conta.html' ***
               window.location.href = 'minha-conta.html';
-              return; // Para a execução aqui
+              return;
             }
 
-            // Se a verificação passou, continua para o pagamento
+            // ETAPA 3: Criar preferência de pagamento com frete incluso
             payButton.textContent = 'Aguarde...';
-            
-            // ETAPA 3: Criar a preferência de pagamento (lógica que já existia)
             const paymentResponse = await fetch('/api/payment/create_preference', {
               method: 'POST',
               headers: {
@@ -265,14 +309,13 @@
               body: JSON.stringify({
                 boxType: boxType,
                 planId: planId,
-                price: parseFloat(unitPrice.toFixed(2)),
+                price: parseFloat((unitPrice + valorFrete).toFixed(2)),
                 title: displayText,
                 duration: duration
               })
             });
 
             const paymentData = await paymentResponse.json();
-
             if (!paymentResponse.ok) {
               throw new Error(paymentData.error || 'Não foi possível criar a preferência de pagamento.');
             }
@@ -287,9 +330,7 @@
             payButton.disabled = false;
           }
         });
-        // ==================================================================
-        // FIM DA ALTERAÇÃO
-        // ==================================================================
+
       });
     </script>
     <!-- ===== Fim do Script específico do Checkout ===== -->

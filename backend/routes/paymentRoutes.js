@@ -15,97 +15,110 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Mapeamento de planos
 const PLANOS = {
-  firstLove: { nome: 'K-BOXY First Love (Compra Única)', valor: 69.90, duracao: 'Única' },
-  fl_semi_annual: { nome: 'K-BOXY First Love (Assinatura Semestral)', valor: 54.90, duracao: '6 meses' },
-  fl_annual: { nome: 'K-BOXY First Love (Assinatura Anual)', valor: 49.90, duracao: '12 meses' },
-  idolBox: { nome: 'K-BOXY Lover (Compra Única)', valor: 79.90, duracao: 'Única' },
-  il_semi_annual: { nome: 'K-BOXY Lover (Assinatura Semestral)', valor: 64.90, duracao: '6 meses' },
-  il_annual: { nome: 'K-BOXY Lover (Assinatura Anual)', valor: 59.90, duracao: '12 meses' },
-  legendBox: { nome: 'K-BOXY True Love (Compra Única)', valor: 99.90, duracao: 'Única' },
-  tl_semi_annual: { nome: 'K-BOXY True Love (Assinatura Semestral)', valor: 84.90, duracao: '6 meses' },
-  tl_annual: { nome: 'K-BOXY True Love (Assinatura Anual)', valor: 79.90, duracao: '12 meses' },
-  miniKBoxyPromo: { nome: 'Mini K-BOXY – Compra Única', valor: 30.00, duracao: 'Única' }
+  firstLove:       { nome: 'K-BOXY First Love (Compra Única)',        valor: 69.90, duracao: 'Única' },
+  fl_semi_annual:  { nome: 'K-BOXY First Love (Assinatura Semestral)', valor: 54.90, duracao: '6 meses' },
+  fl_annual:       { nome: 'K-BOXY First Love (Assinatura Anual)',     valor: 49.90, duracao: '12 meses' },
+  idolBox:         { nome: 'K-BOXY Lover (Compra Única)',              valor: 79.90, duracao: 'Única' },
+  il_semi_annual:  { nome: 'K-BOXY Lover (Assinatura Semestral)',      valor: 64.90, duracao: '6 meses' },
+  il_annual:       { nome: 'K-BOXY Lover (Assinatura Anual)',         valor: 59.90, duracao: '12 meses' },
+  legendBox:       { nome: 'K-BOXY True Love (Compra Única)',         valor: 99.90, duracao: 'Única' },
+  tl_semi_annual:  { nome: 'K-BOXY True Love (Assinatura Semestral)', valor: 84.90, duracao: '6 meses' },
+  tl_annual:       { nome: 'K-BOXY True Love (Assinatura Anual)',     valor: 79.90, duracao: '12 meses' },
+  miniKBoxyPromo:  { nome: 'Mini K-BOXY – Compra Única',             valor: 30.00, duracao: 'Única' }
 };
 
-
-/// Rota CORRIGIDA para criar preferência E SALVAR o pedido
-router.post('/create_preference', auth, async (req, res) => { // <-- Adicionamos 'auth'
+/// Rota para criar preferência E SALVAR o pedido
+router.post('/create_preference', auth, async (req, res) => {
   try {
-    const { planId, boxType, price, duration, title } = req.body;
-    const userId = req.userId; // O middleware 'auth' nos dá o ID do usuário
+    // Desestruturação incluindo totalPrice
+    const { planId, boxType, price, totalPrice, duration, title } = req.body;
+    const userId = req.userId;
 
     if (!planId || !PLANOS[planId]) {
       return res.status(400).json({ error: 'Plano inválido.' });
     }
 
+    // Usa totalPrice se fornecido, senão cai no price original
+    const priceToUse = (totalPrice !== undefined && !isNaN(parseFloat(totalPrice)))
+      ? parseFloat(totalPrice)
+      : price;
+
     const isSubscription = duration > 1;
 
     // 1. Cria a preferência no Mercado Pago
-    const itens = [{ title: title, unit_price: parseFloat(price.toFixed(2)), quantity: 1, currency_id: 'BRL' }];
+    const unitPrice = parseFloat(priceToUse.toFixed(2));
+    const itens = [{
+      title: title,
+      unit_price: unitPrice,
+      quantity: 1,
+      currency_id: 'BRL'
+    }];
     const serverUrl = process.env.SERVER_URL || 'https://kboxy-teste-site.onrender.com';
 
     const preferencePayload = {
       items: itens,
       back_urls: {
-        success: `${serverUrl}/api/payment/success`, // Mantém o fluxo atual
+        success: `${serverUrl}/api/payment/success`,
         failure: `${serverUrl}/failure.html`,
         pending: `${serverUrl}/pending.html`,
       },
       auto_return: 'approved',
-      external_reference: userId 
+      external_reference: userId
     };
 
     if (isSubscription) {
       preferencePayload.auto_recurring = {
         frequency: 1,
         frequency_type: 'months',
-        transaction_amount: parseFloat(price.toFixed(2)),
+        transaction_amount: unitPrice,
         currency_id: 'BRL',
         repetitions: duration
       };
     }
 
-    const mpResponse = await axios.post('https://api.mercadopago.com/checkout/preferences', preferencePayload, {
-      headers: {
-        Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
-        'Content-Type': 'application/json',
-      },
-    });
+    const mpResponse = await axios.post(
+      'https://api.mercadopago.com/checkout/preferences',
+      preferencePayload,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
 
     const preferenceId = mpResponse.data.id;
-    const checkoutUrl = mpResponse.data.init_point;
+    const checkoutUrl   = mpResponse.data.init_point;
 
     console.log(`[Create_Preference] Preferência MP ${preferenceId} criada para o usuário ${userId}.`);
 
     // 2. SALVA O PEDIDO NO BANCO DE DADOS ANTES DE REDIRECIONAR
     const orderData = {
-      userId: userId,
-      boxType: boxType || planId, 
-      planType: planId, 
-      amount: price,
-      paymentId: preferenceId, // Salva o ID da preferência do MP
+      userId:        userId,
+      boxType:       boxType || planId,
+      planType:      planId,
+      amount:        unitPrice,
+      paymentId:     preferenceId,
       isSubscription: isSubscription,
-      duration: duration,
-      status: 'pending'
+      duration:      duration,
+      status:        'pending'
     };
 
     const newOrder = new Order(orderData);
     await newOrder.save();
-
     console.log(`[Create_Preference] Pedido ${newOrder._id} salvo no DB com paymentId ${preferenceId}.`);
 
     // 3. Retorna a URL de checkout para o frontend
     return res.json({ checkoutUrl: checkoutUrl, preferenceId: preferenceId });
 
   } catch (err) {
-    console.error('Erro CRÍTICO ao criar preferência/pedido:', err.response ? err.response.data : err.message);
+    console.error('Erro ao criar preferência/pedido:', err.response ? err.response.data : err.message);
     return res.status(500).json({ error: 'Erro interno ao criar a ordem de pagamento.' });
   }
 });
 
-
 // ===================================================================
-// INÍCIO DA SEÇÃO FINAL E CORRIGIDA
+// CALLBACKS DE PAGAMENTO (sem alterações necessárias)
 // ===================================================================
 router.get('/success', async (req, res) => {
   console.log('[SUCCESS] Callback /success acionado. Query:', req.query);
@@ -116,72 +129,65 @@ router.get('/success', async (req, res) => {
       return res.sendFile(path.join(__dirname, '..', '..', 'payment', 'success.html'));
     }
 
-    console.log(`[SUCCESS] Buscando pedido com paymentId (preference_id): ${prefId}`);
+    console.log(`[SUCCESS] Buscando pedido com paymentId: ${prefId}`);
     let order = await Order.findOne({ paymentId: prefId });
 
-    // *** LÓGICA DE NOVA TENTATIVA ***
-    // Se o pedido não for encontrado na primeira tentativa, espere 2 segundos e tente de novo.
     if (!order) {
-      console.warn(`[SUCCESS-WARN] Pedido com paymentId ${prefId} não encontrado. Tentando novamente em 2 segundos...`);
-      await delay(2000); // Pausa de 2 segundos
+      console.warn(`[SUCCESS-WARN] Pedido não encontrado. Tentando novamente em 2s...`);
+      await delay(2000);
       order = await Order.findOne({ paymentId: prefId });
     }
 
-    // Agora, verificamos novamente. Se ainda for nulo, registramos um erro final.
     if (!order) {
-      console.error(`[SUCCESS-ERROR-FINAL] Pedido com paymentId ${prefId} NÃO FOI ENCONTRADO mesmo após a espera. A assinatura não pode ser criada.`);
+      console.error(`[SUCCESS-ERROR-FINAL] Pedido não encontrado. Assinatura não criada.`);
       return res.sendFile(path.join(__dirname, '..', '..', 'payment', 'success.html'));
     }
 
-    console.log(`[SUCCESS] Pedido encontrado para o usuário: ${order.userId}. Verificando se é uma assinatura...`);
-
     if (order.isSubscription) {
-     const hoje = new Date();
+      const hoje = new Date();
       const dataProxima = new Date(hoje);
       dataProxima.setMonth(dataProxima.getMonth() + 1);
-
-      // CORREÇÃO: Pega a duração diretamente do pedido, que já está correta (ex: 6 ou 12)
       const duracao = order.duration;
       const repsLeft = duracao > 1 ? (duracao - 1) : 0;
 
-      // CORREÇÃO: Determina o nome do plano a partir do ID do plano (ex: "fl_semi_annual")
       let planTypeString = 'Desconhecido';
       if (order.planType.includes('annual')) {
-          planTypeString = 'Anual';
+        planTypeString = 'Anual';
       } else if (order.planType.includes('semi_annual')) {
-          planTypeString = 'Semestral';
+        planTypeString = 'Semestral';
       }
 
       let subs = await Subscription.findOne({ userId: order.userId });
-
       if (!subs) {
-        console.log(`[SUCCESS] Criando nova assinatura para o usuário ${order.userId}...`);
-        subs = new Subscription({ userId: order.userId, boxType: order.boxType, planType: planTypeString, startDate: hoje, nextPaymentDate: dataProxima, repetitionsLeft: repsLeft, status: 'active' });
+        subs = new Subscription({
+          userId:         order.userId,
+          boxType:        order.boxType,
+          planType:       planTypeString,
+          startDate:      hoje,
+          nextPaymentDate: dataProxima,
+          repetitionsLeft: repsLeft,
+          status:         'active'
+        });
       } else {
-        console.log(`[SUCCESS] Atualizando assinatura existente para o usuário ${order.userId}...`);
-        subs.boxType = order.boxType;
-        subs.planType = planTypeString;
-        subs.startDate = hoje;
+        subs.boxType        = order.boxType;
+        subs.planType       = planTypeString;
+        subs.startDate      = hoje;
         subs.nextPaymentDate = dataProxima;
         subs.repetitionsLeft = repsLeft;
-        subs.status = 'active';
+        subs.status         = 'active';
       }
-      
       await subs.save();
-      console.log(`[SUCCESS] Assinatura para o usuário ${order.userId} salva com sucesso!`);
+      console.log(`[SUCCESS] Assinatura atualizada/criada para o usuário ${order.userId}.`);
     } else {
-      console.log('[SUCCESS] O pedido é uma compra única. Nenhuma ação de assinatura necessária.');
+      console.log('[SUCCESS] Compra única. Sem ação de assinatura.');
     }
 
     return res.sendFile(path.join(__dirname, '..', '..', 'payment', 'success.html'));
   } catch (err) {
-    console.error('[SUCCESS-CRITICAL] Erro inesperado no callback de sucesso:', err);
+    console.error('[SUCCESS-CRITICAL] Erro no callback de sucesso:', err);
     return res.status(500).send('Erro interno ao processar seu pagamento.');
   }
 });
-// ===================================================================
-// FIM DA SEÇÃO FINAL E CORRIGIDA
-// ===================================================================
 
 router.get('/failure', (req, res) => {
   console.log('Callback Failure - Query:', req.query);
