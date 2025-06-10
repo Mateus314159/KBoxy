@@ -632,6 +632,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.addEventListener('scroll', () => { handleScrollHeader(); handleBackToTopButton(); });
     
+    // ─── Esqueci minha senha ───
+const forgotLink = document.getElementById('forgot-password-link');
+if (forgotLink) {
+  forgotLink.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const email = prompt('Digite seu e-mail para recuperação de senha:');
+    if (!email) return;
+
+    try {
+      const res = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json();
+      alert(data.message || 'Se existe essa conta, você receberá um e-mail.');
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao enviar e-mail de recuperação.');
+    }
+  });
+}
+// ─────────────────────────────
+
+
     handleScrollHeader();
     handleBackToTopButton();
     updateUIAfterLogin();
