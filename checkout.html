@@ -234,32 +234,22 @@
           // (que irá reabrir o modal) ou recarregar a página para tentar de novo.
         });
 
-        btnCalcFrete.addEventListener('click', async () => {
-          btnCalcFrete.disabled = true;
-          freteResult.textContent = 'Calculando...';
+  // +++ INÍCIO DA CORREÇÃO - FRETE FIXO +++
+        btnCalcFrete.addEventListener('click', () => { // A função não precisa mais ser 'async'
+          freteResult.textContent = 'Verificando...';
           const cep = document.getElementById('inputCep').value.replace(/\D/g, '');
           
-          try {
-            const res = await fetch('/api/frete', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ cep })
-            });
-            const data = await res.json();
-            if (data.frete != null) {
-              valorFrete = data.frete;
+          // Simplesmente validamos se um CEP com 8 dígitos foi inserido
+          if (cep.length === 8) {
+              valorFrete = 20.00; // Define o valor fixo do frete
               freteResult.textContent = `Frete: R$ ${valorFrete.toFixed(2)}`;
-              btnConfirmFrete.disabled = false;
-            } else {
-              throw new Error('Não foi possível obter o valor do frete.');
-            }
-          } catch(err) {
-              console.error('Erro ao calcular frete:', err);
-              freteResult.textContent = 'Erro ao calcular frete. Tente novamente.';
-          } finally {
-            btnCalcFrete.disabled = false;
+              btnConfirmFrete.disabled = false; // Libera o botão de confirmação
+          } else {
+              freteResult.textContent = 'Por favor, insira um CEP válido.';
+              btnConfirmFrete.disabled = true;
           }
         });
+        // +++ FIM DA CORREÇÃO +++
 
         // ALTERAÇÃO 2: Lógica de confirmação do frete
         btnConfirmFrete.addEventListener('click', () => {
