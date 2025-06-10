@@ -6,10 +6,8 @@
     <title>Checkout – K-boxy</title>
     <meta name="description" content="Finalize sua compra na K-boxy e receba sua box misteriosa de K-pop!">
 
-    <!-- Ícone da aba -->
     <link rel="icon" type="image/png" href="images/logo.png">
 
-    <!-- CSS principal e fontes -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/minha-conta.css">
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
@@ -24,16 +22,15 @@
 </head>
 <body>
 
-    <!-- Preloader (igual ao index.html) -->
     <div class="preloader">
         <img src="images/logo-k-boxy-anim.svg" alt="K-boxy Logo Animado" class="preloader-logo">
     </div>
 
-    <!-- Modal de CEP -->
-    <div id="cepModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;">
+    <div id="cepModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index: 1001; align-items:center; justify-content:center;">
       <div class="modal-content" style="background:#fff; padding:20px; border-radius:8px; max-width:400px; width:90%; text-align:center;">
         <span id="closeCepModal" style="cursor:pointer; float:right; font-size:1.2rem;">&times;</span>
         <h2>Calcular Frete</h2>
+        <p style="margin-bottom: 10px;">Precisamos do seu CEP para calcular o valor da entrega.</p>
         <input type="text" id="inputCep" placeholder="CEP (somente números)" style="width:100%; padding:8px; margin:10px 0;">
         <button id="btnCalcFrete" class="btn btn-primary">Calcular</button>
         <p id="freteResult" style="margin-top:10px;"></p>
@@ -41,7 +38,6 @@
       </div>
     </div>
 
-    <!-- Header idêntico ao index.html -->
     <header class="header">
         <div class="container">
             <a href="index.html#home" class="logo">
@@ -73,7 +69,6 @@
         </div>
     </header>
 
-    <!-- Main do Checkout -->
     <main class="section-padding" style="padding-top: calc(var(--header-height) + 40px);">
         <div class="container" data-aos="fade-up">
             <h1 class="section-title" style="margin-bottom: 30px;">Checkout</h1>
@@ -85,14 +80,12 @@
                         max-width: 600px;
                         margin: 0 auto;
                         text-align: center;">
-                <!-- Aqui será exibido o texto do plano (ex.: "K-BOXY First Love – R$ 69,90") -->
                 <p id="chosenPlanText"
                    style="font-size: 1.2rem;
                           margin-bottom: 25px;
                           color: var(--dark-color);">
                     Carregando informações do plano…
                 </p>
-                <!-- Botão que dispara o fetch para criar preferência ou assinatura -->
                 <button id="payButton" class="btn btn-primary btn-large">
                     Ir para pagamento
                 </button>
@@ -100,7 +93,6 @@
         </div>
     </main>
 
-    <!-- Footer idêntico ao index.html -->
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
@@ -129,17 +121,14 @@
         </div>
     </footer>
 
-    <!-- Back to top -->
     <button id="back-to-top" class="back-to-top-btn" title="Voltar ao topo">
         <i class="fas fa-arrow-up"></i>
     </button>
 
-    <!-- ===== Scripts gerais (AOS, Swiper, script.js original) ===== -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <script src="js/script.js"></script>
 
-    <!-- ===== Script específico do Checkout ===== -->
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         // 1) Lê os parâmetros da URL para identificar o plano e a box.
@@ -216,7 +205,7 @@
             if (duration === 1) {
                 chosenText = `${displayText} – R$ ${unitPrice.toFixed(2)}`;
             } else {
-                chosenText = `${displayText} – R$ ${unitPrice.toFixed(2)} por mês durante ${duration} meses`;
+                chosenText = `${displayText} – R$ ${unitPrice.toFixed(2)} por mês`;
             }
         } else {
             chosenText = 'Plano não selecionado. Por favor, volte e escolha uma box.';
@@ -228,57 +217,91 @@
         const closeCepModal = document.getElementById('closeCepModal');
         const btnCalcFrete  = document.getElementById('btnCalcFrete');
         const btnConfirmFrete = document.getElementById('btnConfirmFrete');
+        const payButton     = document.getElementById('payButton');
         const freteResult   = document.getElementById('freteResult');
         let valorFrete      = 0;
 
+        // ALTERAÇÃO 1: Desabilitar botão de pagamento e mostrar o modal ao carregar a página.
+        payButton.disabled = true;
+        payButton.textContent = 'Calcule o frete para continuar';
+        if (displayText !== 'Plano não definido') {
+            cepModal.style.display = 'flex';
+        }
+
         closeCepModal.addEventListener('click', () => {
           cepModal.style.display = 'none';
+          // O botão de pagamento continuará desabilitado. O usuário precisa clicar nele
+          // (que irá reabrir o modal) ou recarregar a página para tentar de novo.
         });
 
         btnCalcFrete.addEventListener('click', async () => {
+          btnCalcFrete.disabled = true;
+          freteResult.textContent = 'Calculando...';
           const cep = document.getElementById('inputCep').value.replace(/\D/g, '');
-          const res = await fetch('/api/frete', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ cep })
-          });
-          const data = await res.json();
-          if (data.frete != null) {
-            valorFrete = data.frete;
-            freteResult.textContent = `Frete: R$ ${valorFrete.toFixed(2)}`;
-            btnConfirmFrete.disabled = false;
-          } else {
-            freteResult.textContent = 'Erro ao calcular frete.';
+          
+          try {
+            const res = await fetch('/api/frete', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ cep })
+            });
+            const data = await res.json();
+            if (data.frete != null) {
+              valorFrete = data.frete;
+              freteResult.textContent = `Frete: R$ ${valorFrete.toFixed(2)}`;
+              btnConfirmFrete.disabled = false;
+            } else {
+              throw new Error('Não foi possível obter o valor do frete.');
+            }
+          } catch(err) {
+              console.error('Erro ao calcular frete:', err);
+              freteResult.textContent = 'Erro ao calcular frete. Tente novamente.';
+          } finally {
+            btnCalcFrete.disabled = false;
           }
         });
 
+        // ALTERAÇÃO 2: Lógica de confirmação do frete
         btnConfirmFrete.addEventListener('click', () => {
+          const totalAmount = unitPrice + valorFrete;
+          let newDisplayText = '';
+          
           if (duration === 1) {
-            document.getElementById('chosenPlanText').textContent =
-              `${displayText} – R$ ${(unitPrice + valorFrete).toFixed(2)}`;
+              newDisplayText = `${displayText} + Frete – Total: R$ ${totalAmount.toFixed(2)}`;
           } else {
-            document.getElementById('chosenPlanText').textContent =
-              `${displayText} – R$ ${(unitPrice + valorFrete).toFixed(2)} por mês durante ${duration} meses`;
+              newDisplayText = `${displayText.replace(' por mês', '')} + Frete – Total: R$ ${totalAmount.toFixed(2)} por mês`;
           }
+          
+          document.getElementById('chosenPlanText').innerHTML = `
+              ${newDisplayText}<br>
+              <small style="font-size: 0.9rem;">(Plano: R$ ${unitPrice.toFixed(2)} + Frete: R$ ${valorFrete.toFixed(2)})</small>
+          `;
+
           cepModal.style.display = 'none';
+          payButton.disabled = false;
+          payButton.textContent = 'Ir para pagamento';
         });
 
-        // 6) Evento do botão de pagamento, agora incluindo frete
-        document.getElementById('payButton').addEventListener('click', async function() {
-          if (valorFrete === 0) {
+        // 6) Evento do botão de pagamento, agora com o fluxo de frete modificado
+        payButton.addEventListener('click', async function() {
+          // ALTERAÇÃO 3: Se o frete não foi confirmado, abre o modal novamente.
+          if (valorFrete === 0 && !this.disabled) {
+            alert('Por favor, calcule e confirme o frete para continuar.');
             cepModal.style.display = 'flex';
             return;
           }
-          const payButton = this;
+
           const token = localStorage.getItem('authToken');
 
           if (!token) {
             alert('Você precisa estar logado para continuar o pagamento.');
+            // Opcional: redirecionar para login
+            // window.location.href = 'login.html'; 
             return;
           }
 
-          payButton.textContent = 'Verificando dados...';
-          payButton.disabled = true;
+          this.textContent = 'Verificando dados...';
+          this.disabled = true;
 
           try {
             // ETAPA 1: Verificar dados do usuário
@@ -299,7 +322,12 @@
             }
 
             // ETAPA 3: Criar preferência de pagamento com frete incluso
-            payButton.textContent = 'Aguarde...';
+            this.textContent = 'Aguarde...';
+            
+            // O título agora reflete o valor total para clareza no MP
+            const finalTitle = `${displayText} (Plano + Frete)`;
+            const finalPrice = parseFloat((unitPrice + valorFrete).toFixed(2));
+            
             const paymentResponse = await fetch('/api/payment/create_preference', {
               method: 'POST',
               headers: {
@@ -309,8 +337,8 @@
               body: JSON.stringify({
                 boxType: boxType,
                 planId: planId,
-                price: parseFloat((unitPrice + valorFrete).toFixed(2)),
-                title: displayText,
+                price: finalPrice, // Envia o preço já somado
+                title: finalTitle,
                 duration: duration
               })
             });
@@ -326,14 +354,12 @@
           } catch (err) {
             console.error('Erro no processo de checkout:', err);
             alert('Houve um erro: ' + err.message);
-            payButton.textContent = 'Ir para pagamento';
-            payButton.disabled = false;
+            this.textContent = 'Ir para pagamento';
+            this.disabled = false; // Reabilita em caso de erro
           }
         });
 
       });
     </script>
-    <!-- ===== Fim do Script específico do Checkout ===== -->
-
-</body>
+    </body>
 </html>
