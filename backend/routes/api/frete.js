@@ -6,12 +6,12 @@ const calcularFrete = require('../../utils/frete');
 // POST /api/frete
 router.post('/frete', async (req, res) => {
   try {
-    const valorFrete = await calcularFrete(req.body.cep);
-    return res.json({ frete: valorFrete });
+    const { cep } = req.body;
+    const valorFrete = await calcularFrete(cep);
+    res.json({ frete: valorFrete });
   } catch (err) {
-    console.error('[API Frete] ', err);
-    // envia err.message para o front
-    return res.status(500).json({ error: err.message });
+    console.error('Erro ao calcular frete:', err);
+    res.status(500).json({ error: 'Não foi possível calcular o frete.' });
   }
 });
 
