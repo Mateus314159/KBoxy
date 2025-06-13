@@ -7,13 +7,14 @@ const userSchema = new mongoose.Schema(
     password: { type: String, required: true },
     name: { type: String, default: '' }, // Para o nome do usuário
     avatarUrl: { type: String, default: '' }, // Para a URL da foto do perfil // << VÍRGULA ADICIONADA AQUI
-    // **** CÓDIGO NOVO - Objeto de Endereço ****
+  // **** CÓDIGO NOVO - Objeto de Endereço ****
     address: {
       street: { type: String, default: '' },
+      number: { type: String, default: '' }, // <-- ADICIONE ESTA LINHA
       complement: { type: String, default: '' },
       neighborhood: { type: String, default: '' },
       city: { type: String, default: '' },
-      state: { type: String, default: '' }, // Adicionado Estado
+      state: { type: String, default: '' },
       zipcode: { type: String, default: '' }
     }
     // **** FIM DO CÓDIGO NOVO ****

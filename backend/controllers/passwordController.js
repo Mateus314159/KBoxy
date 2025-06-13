@@ -1,37 +1,41 @@
 // backend/controllers/passwordController.js
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const { sendMail } = require('../utils/mailer');
-const bcrypt = require('bcryptjs'); // Adicionado para criptografar a nova senha
+const mailer = require('../utils/mailer'); // ALTERADO para importar o objeto mailer completo
+const bcrypt = require('bcryptjs');
 
 exports.requestPasswordReset = async (req, res) => {
   try {
     const { email } = req.body;
-    const user  = await User.findOne({ email });
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: 'E-mail não cadastrado.' });
     }
 
-    // 1) criar token que expira em 1h
     const token = jwt.sign(
       { id: user._id },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
 
-    // 2) montar link que o front vai usar
-    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+    const resetLink = `${process.env.FRONTEND_URL || 'https://kboxy-teste-site.onrender.com'}/reset-password?token=${token}`;
 
-    // 3) enviar e-mail
-    await sendMail({
-      to: user.email,
-      subject: '🔒 Redefinição de senha K-Boxy',
-      html: `
-        <p>Olá,</p>
-        <p>Você solicitou a redefinição de senha. Clique no link abaixo para criar uma nova senha (válido por 1h):</p>
-        <a href="${resetLink}">${resetLink}</a>
-      `
-    });
+    // +++ INÍCIO DA ATUALIZAÇÃO PARA TEMPLATE +++
+    // Envia e-mail de redefinição usando o novo template profissional
+    try {
+      await mailer.sendTemplatedMail(
+        user.email,
+        'Redefinição de Senha da K-boxy',
+        'passwordReset', // Nome do template: passwordReset.html
+        {
+          resetLink: resetLink
+        }
+      );
+    } catch (emailError) {
+      console.error('Falha ao enviar e-mail de redefinição de senha:', emailError);
+      // Continua a resposta de sucesso para o usuário, mesmo que o e-mail falhe, por segurança.
+    }
+    // +++ FIM DA ATUALIZAÇÃO PARA TEMPLATE +++
 
     res.json({ message: 'E-mail de recuperação enviado.' });
   } catch (err) {
@@ -40,31 +44,23 @@ exports.requestPasswordReset = async (req, res) => {
   }
 };
 
-
-// +++ INÍCIO DA CORREÇÃO +++
-// Nova função para redefinir a senha
 exports.resetPassword = async (req, res) => {
   try {
     const { token, newPassword } = req.body;
 
-    // Valida se o token e a nova senha foram enviados
     if (!token || !newPassword) {
       return res.status(400).json({ message: 'Token e nova senha são obrigatórios.' });
     }
 
-    // Verifica a validade do token JWT
     let decoded;
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (err) {
-      // Retorna erro se o token for inválido ou tiver expirado
       return res.status(401).json({ message: 'Token inválido ou expirado. Solicite uma nova redefinição de senha.' });
     }
 
-    // Criptografa a nova senha antes de salvar
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    // Encontra o usuário pelo ID (extraído do token) e atualiza a senha
     const updatedUser = await User.findByIdAndUpdate(
       decoded.id,
       { password: hashedPassword },
@@ -81,4 +77,3 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ message: 'Ocorreu um erro interno ao redefinir sua senha.' });
   }
 };
-// +++ FIM DA CORREÇÃO +++

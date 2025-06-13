@@ -30,6 +30,27 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ Conectado ao MongoDB'))
   .catch(err => console.error('Erro ao conectar ao MongoDB:', err));
 
+// ==========================================================
+//           INÍCIO DO CÓDIGO DE DIAGNÓSTICO (CORRIGIDO)
+// ==========================================================
+try {
+  // CORREÇÃO: O caminho agora é direto para 'models', pois já estamos dentro de 'backend'
+  const Order = require('./models/Order'); 
+  console.log('================================================');
+  console.log('--- DIAGNÓSTICO DO ESQUEMA DO MODELO ORDER ---');
+  // A linha abaixo vai nos mostrar todos os campos que o seu modelo Order realmente conhece
+  console.log(Object.keys(Order.schema.paths));
+  console.log('--- FIM DO DIAGNÓSTICO ---');
+  console.log('================================================');
+} catch (e) {
+  console.log('🚨 ERRO AO CARREGAR MODELO ORDER PARA DIAGNÓSTICO:', e);
+}
+// ==========================================================
+//            FIM DO CÓDIGO DE DIAGNÓSTICO
+// ==========================================================
+
+
+
 // 4. IMPORTAR ROTAS EXISTENTES (autenticação, pedidos, usuários)
 const authRoutes = require('./routes/authRoutes');
 const orderRoutes = require('./routes/orderRoutes');
@@ -42,6 +63,7 @@ const paymentRoutes = require('./routes/paymentRoutes');
 const purchaseRoutes = require('./routes/purchaseRoutes');
 
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
+
 
 // 5. MONTAR ROTAS DE API
 app.use('/api/auth', authRoutes);
@@ -56,6 +78,9 @@ app.use('/purchase', purchaseRoutes);
 
 // 5.3. MONTAR A ROTA DE ASSINATURAS
 app.use('/api/subscription', subscriptionRoutes);
+
+app.use('/api/payment', paymentRoutes);
+
 
 // NOVA ROTA PARA A PÁGINA DE REDEFINIÇÃO DE SENHA
 app.get('/reset-password', (req, res) => {

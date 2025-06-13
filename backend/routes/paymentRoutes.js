@@ -9,6 +9,8 @@ const router = express.Router();
 
 const Order         = require('../models/Order');
 const Subscription  = require('../models/Subscription');
+const User          = require('../models/User'); // <<< ADICIONE
+const mailer        = require('../utils/mailer'); // <<< ADICIONE
 
 // Função auxiliar para criar uma pausa (delay)
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -182,7 +184,62 @@ router.get('/success', async (req, res) => {
       console.log('[SUCCESS] Compra única. Sem ação de assinatura.');
     }
 
-    return res.sendFile(path.join(__dirname, '..', '..', 'payment', 'success.html'));
+    // ===================================================================
+// INÍCIO - LÓGICA DE ENVIO DE E-MAIL
+// ===================================================================
+try {
+  // 1. Buscar os dados completos do usuário (incluindo nome, email e endereço)
+  const buyer = await User.findById(order.userId);
+  if (!buyer) {
+    console.error(`[EMAIL-ERROR] Usuário com ID ${order.userId} não encontrado para envio de e-mail.`);
+  } else {
+    // 2. Preparar os dados para os templates
+    const planDetails = PLANOS[order.planType] || { nome: 'Plano Desconhecido' };
+    const emailData = {
+      planName: planDetails.nome,
+      boxType: order.boxType,
+      amount: order.amount.toFixed(2),
+      duration: order.isSubscription ? `${order.duration} meses` : 'Compra Única',
+      customerName: buyer.name,
+      customerEmail: buyer.email,
+      street: buyer.address.street,
+      number: buyer.address.number,
+      complement: buyer.address.complement,
+      neighborhood: buyer.address.neighborhood,
+      city: buyer.address.city,
+      state: buyer.address.state,
+      zipcode: buyer.address.zipcode,
+       currentYear: new Date().getFullYear()
+    };
+
+    // 3. Enviar e-mail de confirmação para o administrador
+    await mailer.sendTemplatedMail(
+      'kboxy.pop@gmail.com',
+      `Nova Venda K-BOXY: ${planDetails.nome}`,
+      'adminConfirmation',
+      emailData
+    );
+    console.log(`[EMAIL-SUCCESS] E-mail de notificação de venda enviado para o administrador.`);
+
+    // 4. Enviar e-mail de confirmação para o cliente
+    await mailer.sendTemplatedMail(
+      buyer.email,
+      'Seu pedido K-BOXY foi confirmado!',
+      'customerConfirmation',
+      emailData
+    );
+    console.log(`[EMAIL-SUCCESS] E-mail de confirmação enviado para o cliente: ${buyer.email}`);
+  }
+} catch (emailError) {
+  console.error('[EMAIL-CRITICAL] Falha crítica ao tentar enviar os e-mails de confirmação:', emailError);
+  // A falha no envio de e-mail não deve impedir a confirmação do pagamento para o usuário.
+}
+// ===================================================================
+// FIM - LÓGICA DE ENVIO DE E-MAIL
+// ===================================================================
+
+return res.sendFile(path.join(__dirname, '..', '..', 'payment', 'success.html'));
+    
   } catch (err) {
     console.error('[SUCCESS-CRITICAL] Erro no callback de sucesso:', err);
     return res.status(500).send('Erro interno ao processar seu pagamento.');

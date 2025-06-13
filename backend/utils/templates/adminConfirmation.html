@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Venda Confirmada</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100% !important;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            background-color: #F4F4F7; /* Fundo cinza claro, padrão de apps modernos */
+            font-family: 'Poppins', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #333333;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .email-wrapper {
+            background-color: #FFFFFF;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header img {
+            max-width: 100px;
+        }
+        .main-heading {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-top: 20px;
+            margin-bottom: 5px;
+        }
+        .main-heading span {
+            color: #D94682; /* Tom de rosa mais sóbrio e elegante */
+        }
+        .sub-heading {
+            font-size: 16px;
+            color: #555555;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .section {
+            margin-bottom: 25px;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #EAEAEA;
+            padding-bottom: 10px;
+        }
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .details-table td {
+            padding: 10px 0;
+            font-size: 14px;
+            border-bottom: 1px solid #EAEAEA;
+        }
+        .details-table tr:last-child td {
+            border-bottom: none;
+        }
+        .details-table .label {
+            color: #666666;
+        }
+        .details-table .value {
+            font-weight: 600;
+            text-align: right;
+            color: #333333;
+        }
+        .address-block {
+            line-height: 1.7;
+            text-align: left;
+            font-size: 14px;
+        }
+        .cta-button {
+            display: block;
+            width: fit-content;
+            margin: 30px auto 0 auto;
+            background-color: #D94682;
+            color: #FFFFFF;
+            padding: 12px 25px;
+            border-radius: 8px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px 0;
+            font-size: 12px;
+            color: #999999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="email-wrapper">
+            <div class="header">
+                <img src="https://kboxy-teste-site.onrender.com/images/logo.png" alt="Logo K-boxy">
+                <h1 class="main-heading">Nova Venda Confirmada: <span>R$ {{amount}}</span></h1>
+            </div>
+            <p class="sub-heading">Uma nova assinatura foi iniciada. Aqui estão os detalhes completos:</p>
+
+            <div class="section">
+                <h2 class="section-title">Detalhes do Pedido</h2>
+                <table class="details-table">
+                    <tr>
+                        <td class="label">Plano</td>
+                        <td class="value">{{planName}}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Tipo de Caixa</td>
+                        <td class="value">{{boxType}}</td>
+                    </tr>
+                     <tr>
+                        <td class="label">Duração</td>
+                        <td class="value">{{duration}}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Informações do Cliente</h2>
+                <table class="details-table">
+                    <tr>
+                        <td class="label">Nome</td>
+                        <td class="value">{{customerName}}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Email</td>
+                        <td class="value">{{customerEmail}}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Endereço de Entrega</h2>
+                <div class="address-block">
+                    {{street}}, {{number}}<br>
+                    {{complement}}<br>
+                    {{neighborhood}}, {{city}} - {{state}}<br>
+                    <strong>CEP:</strong> {{zipcode}}
+                </div>
+            </div>
+
+            <a href="#" class="cta-button">Ver Detalhes do Pedido</a>
+        </div>
+        <div class="footer">
+            <p>E-mail automático do sistema K-boxy.</p>
+            <p>&copy; {{currentYear}} K-boxy. Todos os direitos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sua jornada K-boxy começa agora!</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100% !important;
+            -webkit-text-size-adjust: 100%;
+            background-color: #F4F4F7;
+            font-family: 'Poppins', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #333333;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .email-wrapper {
+            background-color: #FFFFFF;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header img {
+            max-width: 100px;
+            margin-bottom: 20px;
+        }
+        .main-heading {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 0 0 10px 0;
+        }
+        .intro-text {
+            font-size: 16px;
+            color: #555555;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .divider {
+            border: 0;
+            border-top: 1px solid #EAEAEA;
+            margin: 30px 0;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 20px;
+        }
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .details-table td {
+            padding: 12px 0;
+            font-size: 14px;
+            border-bottom: 1px solid #EAEAEA;
+        }
+        .details-table tr:last-child td { border-bottom: none; }
+        .details-table .label { color: #666666; }
+        .details-table .value { font-weight: 600; text-align: right; }
+        
+        .experience-item {
+            display: table;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        .experience-icon {
+            display: table-cell;
+            width: 40px;
+            vertical-align: top;
+            font-size: 24px;
+        }
+        .experience-text {
+            display: table-cell;
+            vertical-align: top;
+        }
+        .experience-text h3 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .experience-text p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .shipping-alert {
+            background-color: #F8F8F8;
+            border-left: 4px solid #D94682; /* Cor de destaque da marca */
+            padding: 15px 20px;
+            margin-top: 20px;
+            border-radius: 0 8px 8px 0;
+        }
+        .shipping-alert p { margin: 0; color: #555; font-size: 13px; line-height: 1.7; }
+
+        .cta-button {
+            display: block;
+            width: fit-content;
+            margin: 30px auto 0 auto;
+            background-color: #D94682;
+            color: #FFFFFF;
+            padding: 12px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px 0;
+            font-size: 12px;
+            color: #999999;
+        }
+        .footer a { color: #D94682; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="email-wrapper">
+            <div class="header">
+                <img src="https://kboxy-teste-site.onrender.com/images/logo.png" alt="Logo K-boxy">
+                <h1 class="main-heading">Sua jornada começa agora, {{customerName}}!</h1>
+            </div>
+
+            <p class="intro-text">Estamos incrivelmente felizes em ter você na família K-boxy. Sua escolha de se juntar a nós significa muito e mal podemos esperar para compartilhar com você uma curadoria especial, feita de fã para fã. Prepare-se para a surpresa!</p>
+            
+            <hr class="divider">
+
+            <h2 class="section-title">Resumo do Pedido</h2>
+            <table class="details-table">
+                <tr>
+                    <td class="label">Seu Plano K-boxy</td>
+                    <td class="value">{{planName}}</td>
+                </tr>
+                <tr>
+                    <td class="label">Valor</td>
+                    <td class="value">R$ {{amount}}</td>
+                </tr>
+            </table>
+
+            <hr class="divider">
+
+            <h2 class="section-title">Nossa Programação</h2>
+            <div class="experience-item">
+                <div class="experience-icon">🗓️</div>
+                <div class="experience-text">
+                    <h3>Cronograma Exclusivo</h3>
+                    <p>Trabalhamos com uma agenda mensal para garantir a máxima qualidade e cuidado na preparação de cada box. Confira como funciona:</p>
+                </div>
+            </div>
+            
+            <div class="shipping-alert">
+                <p>• <strong>Pedidos Abertos:</strong> Do dia 01 ao 20 de cada mês.</p>
+                <p style="margin-top: 8px;">• <strong>Envios:</strong> Pedidos do mês são postados entre os dias 05 e 07 do mês seguinte.</p>
+                <p style="margin-top: 8px;">• <strong>Agenda Fechada:</strong> Do dia 21 ao final do mês, focamos 100% na magia da sua preparação!</p>
+            </div>
+
+            <hr class="divider">
+
+            <h2 class="section-title" style="text-align: center;">Faça parte da nossa comunidade</h2>
+            <p style="text-align: center; margin-top: -15px; margin-bottom: 0; color: #666;">Conecte-se com outros fãs e veja spoilers no Instagram!</p>
+            <a href="https://www.instagram.com/kboxy2025?igsh=bHgzODYxc2dvc3U4" target="_blank" class="cta-button">Seguir @kboxy2025</a>
+            
+        </div>
+        <div class="footer">
+            <p>Qualquer dúvida, nos chame em nosso <a href="https://www.instagram.com/kboxy2025?igsh=bHgzODYxc2dvc3U4" target="_blank">Instagram</a>!</p>
+            <p>&copy; {{currentYear}} K-boxy. Todos os direitos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>

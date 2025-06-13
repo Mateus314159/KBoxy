@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bem-vindo(a) à K-boxy!</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; padding: 0; width: 100% !important; -webkit-text-size-adjust: 100%; background-color: #F4F4F7; font-family: 'Poppins', sans-serif; color: #333333; }
+        .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .email-wrapper { background-color: #FFFFFF; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header img { max-width: 100px; margin-bottom: 20px; }
+        .main-heading { font-size: 24px; font-weight: 700; color: #1a1a1a; margin: 0 0 10px 0; }
+        .intro-text { font-size: 16px; color: #555555; line-height: 1.6; margin-bottom: 30px; text-align: center; }
+        .cta-button { display: block; width: fit-content; margin: 30px auto 0 auto; background-color: #D94682; color: #FFFFFF; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-size: 16px; font-weight: 600; }
+        .footer { text-align: center; padding: 20px 0; font-size: 12px; color: #999999; }
+        .footer a { color: #D94682; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="email-wrapper">
+            <div class="header">
+                <img src="https://kboxy-teste-site.onrender.com/images/logo.png" alt="Logo K-boxy">
+                <h1 class="main-heading">Boas-vindas à K-boxy, {{customerName}}!</h1>
+            </div>
+            <p class="intro-text">Sua conta foi criada com sucesso! Estamos muito felizes por ter você em nossa comunidade de fãs apaixonados por K-pop. Agora, a diversão pode começar!</p>
+            <a href="{{serverUrl}}#boxes" class="cta-button">Descobrir as Boxes</a>
+        </div>
+        <div class="footer">
+            <p>Qualquer dúvida, nos chame em nosso <a href="https://www.instagram.com/kboxy2025?igsh=bHgzODYxc2dvc3U4" target="_blank">Instagram</a>!</p>
+            <p>&copy; {{currentYear}} K-boxy. Todos os direitos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>
