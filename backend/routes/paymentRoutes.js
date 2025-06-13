@@ -55,15 +55,15 @@ router.post('/create_preference', auth, async (req, res) => {
       quantity: 1,
       currency_id: 'BRL'
     }];
-    const serverUrl = process.env.SERVER_URL || 'https://kboxy-teste-site.onrender.com';
+    const serverUrl = process.env.SERVER_URL || 'https://kboxy.onrender.com';
 
     const preferencePayload = {
       items: itens,
-      back_urls: {
-        success: `${serverUrl}/api/payment/success`,
-        failure: `${serverUrl}/failure.html`,
-        pending: `${serverUrl}/pending.html`,
-      },
+     back_urls: {
+  success: `${serverUrl}/api/payment/success`,
+  failure: `${serverUrl}/payment/failure.html`,
+  pending: `${serverUrl}/payment/pending.html`,
+},
       auto_return: 'approved',
       external_reference: userId
     };

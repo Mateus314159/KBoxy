@@ -1,92 +1,123 @@
+// =================================================================
+// 1. IMPORTAÇÕES E CONFIGURAÇÕES INICIAIS
+// =================================================================
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
+
+const PORT = process.env.PORT || 21020;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor rodando na porta ${PORT}`);
+});
+
 const path = require('path');
 
-
-
 const app = express();
-app.use(cors());
-app.use(express.json());
 
+// =================================================================
+// 2. CONFIGURAÇÃO DE MIDDLEWARE PRINCIPAL
+// (Isto precisa vir antes de todas as rotas)
+// =================================================================
+
+// Configuração explícita do CORS para garantir a permissão
+const corsOptions = {
+  origin: [
+    'https://www.kboxy.com.br', 
+    'http://www.kboxy.com.br',
+    'https://kboxy.com.br',
+    'http://kboxy.com.br'
+  ],
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+  optionsSuccessStatus: 204
+};
+
+app.use(cors(corsOptions));
+app.use(express.json()); // Middleware para ler o corpo das requisições em JSON
+
+// =================================================================
+// 3. IMPORTAÇÃO DE TODAS AS ROTAS
+// =================================================================
 const freteRoutes = require('./routes/api/frete');
+const authRoutes = require('./routes/authRoutes');
+const orderRoutes = require('./routes/orderRoutes');
+const userRoutes = require('./routes/userRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
+const purchaseRoutes = require('./routes/purchaseRoutes');
+const subscriptionRoutes = require('./routes/subscriptionRoutes');
+const newsletterRoutes = require('./routes/newsletterRoutes');
+
+// =================================================================
+// 4. MONTAGEM DE TODAS AS ROTAS DE API
+// (Todas as rotas da API devem ser declaradas aqui, ANTES de servir os arquivos estáticos)
+// =================================================================
 app.use('/api', freteRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/payment', paymentRoutes);
+app.use('/purchase', purchaseRoutes);
+app.use('/api/subscription', subscriptionRoutes);
+app.use('/api/newsletter', newsletterRoutes);
 
-// 1. SERVIR ARQUIVOS ESTÁTICOS DO FRONTEND (index.html, checkout.html, CSS, JS, imagens, etc.)
-app.use(express.static(path.join(__dirname, '..')));
 
-// ─── Servir página de redefinição de senha ───
+// =================================================================
+// 5. SERVIR ARQUIVOS ESTÁTICOS (FRONTEND E UPLOADS)
+// (Isto vem DEPOIS das rotas da API)
+// =================================================================
+
+// Servir a página de redefinição de senha
 app.get('/reset-password', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'reset-password.html'));
 });
-// ────────────────────────────────────────────
 
-// 2. SERVIR UPLOADS (AVATARES, IMAGENS, ETC.), se existir pasta de uploads
+// Servir os arquivos de uploads (avatares, etc.)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// 3. CONECTAR AO MONGODB
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('✅ Conectado ao MongoDB'))
-  .catch(err => console.error('Erro ao conectar ao MongoDB:', err));
+// Servir todos os outros arquivos estáticos do frontend (HTML, CSS, JS, etc.)
+// Esta deve ser uma das últimas rotas.
+app.use(express.static(path.join(__dirname, '..')));
 
-// ==========================================================
-//           INÍCIO DO CÓDIGO DE DIAGNÓSTICO (CORRIGIDO)
-// ==========================================================
+
+// =================================================================
+// 6. CONEXÃO COM O BANCO DE DADOS
+// =================================================================
+const mongooseOptions = {
+  useNewUrlParser:    true,
+  useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 10000  // falha em 10s se não conectar
+};
+
+mongoose
+  .connect(process.env.MONGO_URI, mongooseOptions)
+  .then(() => console.log('✅ Conectado ao MongoDB'))
+  .catch(err => {
+    console.error('❌ Erro ao conectar ao MongoDB:', err);
+    process.exit(1);
+  });
+
+// =================================================================
+// 7. CÓDIGO DE DIAGNÓSTICO (Opcional)
+// =================================================================
 try {
-  // CORREÇÃO: O caminho agora é direto para 'models', pois já estamos dentro de 'backend'
   const Order = require('./models/Order'); 
   console.log('================================================');
   console.log('--- DIAGNÓSTICO DO ESQUEMA DO MODELO ORDER ---');
-  // A linha abaixo vai nos mostrar todos os campos que o seu modelo Order realmente conhece
   console.log(Object.keys(Order.schema.paths));
   console.log('--- FIM DO DIAGNÓSTICO ---');
   console.log('================================================');
 } catch (e) {
   console.log('🚨 ERRO AO CARREGAR MODELO ORDER PARA DIAGNÓSTICO:', e);
 }
-// ==========================================================
-//            FIM DO CÓDIGO DE DIAGNÓSTICO
-// ==========================================================
 
+// Novo: só usa a porta que o ambiente (KingHost) injetar
+const PORT = process.env.PORT;
 
+if (!PORT) {
+  console.error('🛑 A variável process.env.PORT não está definida!');
+  process.exit(1);
+}
 
-// 4. IMPORTAR ROTAS EXISTENTES (autenticação, pedidos, usuários)
-const authRoutes = require('./routes/authRoutes');
-const orderRoutes = require('./routes/orderRoutes');
-const userRoutes = require('./routes/userRoutes');
-
-// 4.1. IMPORTAR A NOVA ROTA DE PAGAMENTO
-const paymentRoutes = require('./routes/paymentRoutes');
-
-// 4.2. IMPORTAR A ROTA DE CHECKOUT (purchase)
-const purchaseRoutes = require('./routes/purchaseRoutes');
-
-const subscriptionRoutes = require('./routes/subscriptionRoutes');
-
-
-// 5. MONTAR ROTAS DE API
-app.use('/api/auth', authRoutes);
-app.use('/api/orders', orderRoutes);
-app.use('/api/users', userRoutes);
-
-// 5.1. MONTAR AS ROTAS DE PAGAMENTO
-app.use('/api/payment', paymentRoutes);
-
-// 5.2. MONTAR A ROTA /purchase → envia checkout.html
-app.use('/purchase', purchaseRoutes);
-
-// 5.3. MONTAR A ROTA DE ASSINATURAS
-app.use('/api/subscription', subscriptionRoutes);
-
-app.use('/api/payment', paymentRoutes);
-
-
-// NOVA ROTA PARA A PÁGINA DE REDEFINIÇÃO DE SENHA
-app.get('/reset-password', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'reset-password.html'));
-});
-
-// 6. INICIAR O SERVIDOR
-const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Servidor rodando na porta ${PORT}`));
